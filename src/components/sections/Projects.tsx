@@ -16,7 +16,7 @@ const Projects: React.FC<ProjectsProps> = ({ className = '' }) => {
       • Built full-stack web application serving 300+ active users
       • Integrated Telegram Bot API for seamless communication and notifications
       • Reduced average tutor search time from weeks to hours`,
-      technologies: ['React', 'MongoDB', 'Telegram Bot API'],
+      technologies: ['React', 'MongoDB', 'Telegram API'],
       image: `${import.meta.env.BASE_URL}LionCity.webp`,
       links: {
         demo: 'https://www.lioncitytutors.com/',
@@ -35,6 +35,20 @@ const Projects: React.FC<ProjectsProps> = ({ className = '' }) => {
       links: {
         demo: 'https://toastercosplay.itch.io/an-u',
         github: 'https://github.com/pelican103/ENGR1-GD-Group-Project'
+      },
+    },
+    {
+      id: 'ucla-meal-swipes',
+      title: 'UCLA Meal Swipes',
+      description: `A webpage that lets students buy and sell meal swipes:
+      • Made a 1:1 clone of UCLA’s official UI
+      • Worked on the frontend using Next.js and Tailwind`,
+      technologies: ['Next.js', 'Tailwind'],
+      image: `${import.meta.env.BASE_URL}swipes.webp`,
+      imagePosition: 'object-contain object-top',
+      links: {
+        demo: 'https://www.swipesatucla.com/',
+        github: 'https://github.com/SleepyWoodpecker/swipes-ucla'
       },
     }
   ];
@@ -88,7 +102,7 @@ const Projects: React.FC<ProjectsProps> = ({ className = '' }) => {
 
 
       <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-stretch"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
@@ -98,7 +112,7 @@ const Projects: React.FC<ProjectsProps> = ({ className = '' }) => {
           <motion.div
             key={project.id}
             variants={itemVariants}
-            className="h-full"
+            className="h-full flex"
           >
             <ProjectCard project={project} />
           </motion.div>

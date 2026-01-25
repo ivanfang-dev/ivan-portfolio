@@ -9,6 +9,7 @@ export interface Project {
   description: string;
   technologies: string[];
   image?: string; // Add image support
+  imagePosition?: string; // Custom image positioning
   links: {
     demo?: string;
     github?: string;
@@ -20,7 +21,7 @@ export interface ProjectCardProps {
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
-  const { title, description, technologies, links, image } = project;
+  const { title, description, technologies, links, image, imagePosition } = project;
   const [isHovered, setIsHovered] = useState(false);
 
   return ( 
@@ -31,16 +32,16 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         y: -8,
         transition: { type: 'spring', stiffness: 300, damping: 20 }
       }}
-      className="group"
+      className="group w-full h-full flex"
     >
-      <Card hover={true} className="p-0 h-full flex flex-col relative overflow-hidden">
+      <Card hover={true} className="p-0 w-full flex flex-col relative overflow-hidden">
         {/* Project Image */}
         {image && (
-          <div className="relative h-48 overflow-hidden">
+          <div className="relative h-64 overflow-hidden flex-shrink-0">
             <motion.img
               src={image}
               alt={`${title} screenshot`}
-              className="w-full h-full object-cover"
+              className={`w-full h-full object-cover ${imagePosition || 'object-center'}`}
               initial={{ scale: 1 }}
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.3 }}
@@ -51,7 +52,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         )}
 
         {/* Content Section */}
-        <div className="p-6 flex flex-col flex-grow">
+        <div className="p-8 flex flex-col flex-grow min-h-0">
           {/* Sparkle effect - only show when no image */}
           {!image && (
             <motion.div
@@ -69,7 +70,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
           )}
 
       <motion.h3 
-        className="text-heading-3 text-gray-900 mb-4"
+        className="text-heading-2 text-gray-900 mb-6 flex-shrink-0"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -78,7 +79,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
       </motion.h3>
 
       <motion.div 
-        className="text-gray-600 mb-6 grow"
+        className="text-gray-600 mb-8 flex-grow overflow-hidden"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
@@ -86,15 +87,15 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         {description.split('\n').map((line, index) => {
           if (index === 0) {
             return (
-              <p key={index} className="text-body mb-4 font-medium text-gray-800">
+              <p key={index} className="text-body-large mb-5 font-medium text-gray-800 leading-relaxed">
                 {line.replace(/:\s*$/, '')}
               </p>
             );
           } else if (line.trim().startsWith('•')) {
             return (
-              <div key={index} className="flex-align-start mb-3">
-                <span className="text-[#2774AE] font-semibold text-sm mt-0.5 flex-shrink-0">▸</span>
-                <span className="text-body-small leading-relaxed text-gray-700">
+              <div key={index} className="flex items-start mb-4">
+                <span className="text-[#2774AE] font-semibold text-base mt-1 flex-shrink-0 mr-3">▸</span>
+                <span className="text-body leading-relaxed text-gray-700">
                   {line.replace('•', '').trim()}
                 </span>
               </div>
@@ -106,7 +107,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
 
       {/* Technology Tags */}
       <motion.div 
-        className="flex flex-wrap gap-2 mb-6"
+        className="flex flex-wrap gap-3 mb-8 flex-shrink-0"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
@@ -114,7 +115,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         {technologies.map((tech, index) => (
           <motion.span
             key={index}
-            className="px-3 py-1.5 bg-[#2774AE]/8 text-[#2774AE] text-caption font-medium rounded-full border border-[#2774AE]/15 cursor-default"
+            className="px-4 py-2 bg-[#2774AE]/8 text-[#2774AE] text-body-small font-medium rounded-full border border-[#2774AE]/15 cursor-default"
             whileHover={{ 
               scale: 1.05,
               backgroundColor: 'rgba(39, 116, 174, 0.15)',
@@ -129,7 +130,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
 
           {/* Buttons - always show at bottom for easy access */}
           <motion.div 
-            className="flex gap-3 mt-auto"
+            className="flex gap-4 flex-shrink-0"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.3 }}
@@ -145,7 +146,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                 >
                   <Button
                     variant="primary"
-                    size="sm"
+                    size="md"
                     className="w-full"
                   >
                     <span className="flex items-center justify-center gap-2">
@@ -173,7 +174,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                 >
                   <Button
                     variant="outline"
-                    size="sm"
+                    size="md"
                     className="w-full"
                   >
                     <span className="flex items-center justify-center gap-2">
