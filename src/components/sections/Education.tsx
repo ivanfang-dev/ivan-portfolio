@@ -15,7 +15,7 @@ const Education: React.FC<EducationProps> = ({ className = '' }) => {
       title: 'B.S. Computer Science',
       organization: 'University of California, Los Angeles (UCLA)',
       period: '2025–2029',
-      description: 'Pursuing a Bachelor of Science in Computer Science. Actively engaged in coursework covering software construction, programming in C++, discrete strctures and multivariable calculus.',
+      description: 'Pursuing a Bachelor of Science in Computer Science. Actively engaged in coursework covering software construction, programming in C++, discrete structures and multivariable calculus.',
       type: 'education',
     },
     {
