@@ -14,8 +14,8 @@ const Education: React.FC<EducationProps> = ({ className = '' }) => {
       id: 'ucla',
       title: 'B.S. Computer Science',
       organization: 'University of California, Los Angeles (UCLA)',
-      period: '2025–2029',
-      description: 'Pursuing a Bachelor of Science in Computer Science. Actively engaged in coursework covering software construction, programming in C++, discrete structures and multivariable calculus.',
+      period: '2025–2028',
+      description: "Pursuing a Bachelor of Science in Computer Science (GPA 3.76, expected June 2028). Coursework includes Programming in C++, Software Construction, and Intro to Algorithms and Complexity. Named to the Dean's List (Fall 2025) and awarded the Samueli Foundation Engineering Undergraduate Scholarship.",
       type: 'education',
     },
     {
