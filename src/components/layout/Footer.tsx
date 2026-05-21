@@ -51,7 +51,7 @@ const Footer: React.FC<FooterProps> = ({ className = '' }) => {
     },
     {
       platform: 'GitHub',
-      url: 'https://github.com/pelican103',
+      url: 'https://github.com/ivanfang-dev',
       icon: GitHubIcon,
       label: 'View GitHub Profile',
     },

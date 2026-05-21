@@ -10,6 +10,24 @@ export interface ExperienceProps {
 const Experience: React.FC<ExperienceProps> = ({ className = '' }) => {
   const experienceEntries: TimelineEntry[] = [
     {
+      id: 'amazon-sde-intern',
+      title: 'Incoming Software Development Engineer Intern',
+      organization: 'Amazon',
+      period: 'June 2026 – September 2026',
+      description: `Incoming Software Development Engineer Intern for Summer 2026 in Seattle, WA.`,
+      type: 'experience',
+    },
+    {
+      id: 'intelligence-cubed-swe-intern',
+      title: 'Software Engineering Intern',
+      organization: 'Intelligence Cubed',
+      period: 'March 2026 – June 2026',
+      description: `Led a full frontend refactor from vanilla JavaScript to React + Tailwind CSS (shadcn/ui), establishing a unified design system and improving UI consistency across 10+ application modules.
+      Designed and implemented a centralized design token system (colors, spacing, typography), eliminating 11 legacy CSS files and enforcing scalable styling conventions.
+      Migrated complex UI flows (chat system, modals, navigation) to component-based architecture, improving maintainability and reducing UI-related technical debt.`,
+      type: 'experience',
+    },
+    {
       id: 'founder-lioncity',
       title: 'Founder',
       organization: 'LionCity Tutors',

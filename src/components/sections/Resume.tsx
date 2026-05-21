@@ -41,7 +41,7 @@ const Resume: React.FC<ResumeProps> = ({ className = '' }) => {
   };
 
   const handleOpenInDrive = () => {
-    window.open('https://drive.google.com/file/d/1o1UaElFtvc8uqmM357UdtqvILFl9BnTK/view?usp=sharing', '_blank');
+    window.open('https://drive.google.com/file/d/1a8EMZuOKCuFUuNysYZmg4gh1VtaSNERA/view?usp=sharing', '_blank');
   };
 
   return (
