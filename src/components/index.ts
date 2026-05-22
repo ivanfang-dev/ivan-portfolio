@@ -7,6 +7,12 @@ export { default as Timeline } from './ui/Timeline';
 export { default as Boop } from './ui/Boop';
 export { default as ExplosiveImage } from './ui/ExplosiveImage';
 export { default as FloatingElements } from './ui/FloatingElements';
+export { default as RevealText } from './ui/RevealText';
+export { default as Marquee } from './ui/Marquee';
+export { default as SectionHeader } from './ui/SectionHeader';
+export type { RevealTextProps } from './ui/RevealText';
+export type { MarqueeProps } from './ui/Marquee';
+export type { SectionHeaderProps } from './ui/SectionHeader';
 export type { ButtonProps } from './ui/Button';
 export type { CardProps } from './ui/Card';
 export type { SectionProps } from './ui/Section';
@@ -21,6 +27,7 @@ export type { FooterProps, SocialLink } from './layout/Footer';
 
 
 export { default as Hero } from './sections/Hero';
+export { default as MarqueeBand } from './sections/MarqueeBand';
 export { default as About } from './sections/About';
 export { default as Projects } from './sections/Projects';
 export { default as Experience } from './sections/Experience';

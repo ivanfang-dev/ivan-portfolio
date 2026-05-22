@@ -1,44 +1,34 @@
-import { Navbar, Hero, About, Projects, Experience, Education, Resume, Footer } from './components';
+import { Navbar, Hero, MarqueeBand, About, Projects, Experience, Education, Resume, Footer } from './components';
 import { useScrollSpy } from './hooks';
 import { scrollToTop } from './utils/smoothScroll';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 function App() {
   const activeSection = useScrollSpy(['hero', 'about', 'projects', 'experience', 'education', 'resume']);
   const [isLoading, setIsLoading] = useState(true);
+  const { scrollYProgress } = useScroll();
 
-  // Handle initial page load
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
+    const timer = setTimeout(() => setIsLoading(false), 800);
     return () => clearTimeout(timer);
   }, []);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-[#2774AE] to-blue-500">
+      <div className="min-h-screen flex items-center justify-center bg-canvas">
         <motion.div
-          className="text-center"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
+          className="flex flex-col items-center gap-5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
         >
           <motion.div
-            className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full mx-auto mb-4"
+            className="w-10 h-10 border-2 border-ink-faint/20 border-t-ucla-blue rounded-full"
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
           />
-          <motion.p
-            className="text-white text-lg font-medium"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            Loading...
-          </motion.p>
+          <p className="text-caption text-ink-faint">Ivan Fang</p>
         </motion.div>
       </div>
     );
@@ -46,17 +36,24 @@ function App() {
 
   return (
     <AnimatePresence>
-      <motion.div 
-        className="min-h-screen bg-white"
+      <motion.div
+        className="min-h-screen bg-canvas"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5 }}
       >
+        {/* Scroll progress bar */}
+        <motion.div
+          className="fixed top-0 left-0 right-0 h-[3px] bg-ucla-blue origin-left z-[60]"
+          style={{ scaleX: scrollYProgress }}
+        />
+
         <Navbar />
-        
+
         <main className="relative">
           <Hero />
+          <MarqueeBand />
           <About />
           <Projects />
           <Experience />
@@ -66,20 +63,20 @@ function App() {
 
         <Footer />
 
-        {/* Scroll to top button */}
+        {/* Scroll to top */}
         <motion.button
-          className="fixed bottom-8 right-8 z-40 p-3 bg-[#2774AE] text-white rounded-full shadow-lg hover:bg-[#1e5a8a] transition-all duration-300 hover:scale-110"
+          className="fixed bottom-8 right-8 z-40 grid place-items-center h-12 w-12 rounded-full bg-white/80 backdrop-blur border border-hairline text-ink shadow-lg hover:text-ucla-blue transition-colors"
           onClick={() => scrollToTop({ duration: 400 })}
           initial={{ opacity: 0, scale: 0 }}
-          animate={{ 
+          animate={{
             opacity: activeSection !== 'hero' ? 1 : 0,
-            scale: activeSection !== 'hero' ? 1 : 0
+            scale: activeSection !== 'hero' ? 1 : 0,
           }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.92 }}
           aria-label="Scroll to top"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
           </svg>
         </motion.button>
@@ -88,4 +85,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

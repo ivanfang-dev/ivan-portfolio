@@ -1,106 +1,80 @@
-  import React from 'react';
-  import { motion } from 'framer-motion';
-  import Card from './Card';
+import React, { useRef } from 'react';
+import { motion, useScroll, useReducedMotion } from 'framer-motion';
+import { EASE } from '../../utils/motion';
 
-  export interface TimelineEntry {
-    id: string;
-    title: string;
-    organization: string;
-    period: string;
-    description: string;
-    type: 'experience' | 'education';
-  }
+export interface TimelineEntry {
+  id: string;
+  title: string;
+  organization: string;
+  period: string;
+  description: string;
+  type: 'experience' | 'education';
+}
 
-  export interface TimelineProps {
-    entries: TimelineEntry[];
-    className?: string;
-  }
+export interface TimelineProps {
+  entries: TimelineEntry[];
+  className?: string;
+}
 
-  const Timeline: React.FC<TimelineProps> = ({ entries, className = '' }) => {
+const Timeline: React.FC<TimelineProps> = ({ entries, className = '' }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
 
-    const containerVariants = {
-      hidden: { opacity: 0 },
-      visible: {
-        opacity: 1,
-        transition: {
-          staggerChildren: 0.2,
-          delayChildren: 0.1,
-        },
-      },
-    };
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start 0.85', 'end 0.55'],
+  });
 
-    const entryVariants = {
-      hidden: { opacity: 0, y: 30 },
-      visible: {
-        opacity: 1,
-        y: 0,
-        transition: {
-          duration: 0.6,
-          ease: [0.25, 0.46, 0.45, 0.94] as const,
-        },
-      },
-    };
-
-    return (
+  return (
+    <div ref={ref} className={`relative ${className}`}>
+      {/* Static track */}
+      <div className="absolute left-[6px] top-2 bottom-2 w-px bg-hairline" />
+      {/* Progress line that fills with scroll */}
       <motion.div
-        className={`space-y-6 ${className}`}
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-50px' }}
-      >
-        {entries.map((entry, index) => (
+        className="absolute left-[6px] top-2 bottom-2 w-px bg-ucla-blue origin-top"
+        style={reduce ? { scaleY: 1 } : { scaleY: scrollYProgress }}
+      />
+
+      <div className="space-y-12">
+        {entries.map((entry, i) => (
           <motion.div
             key={entry.id}
-            variants={entryVariants}
-            className="relative"
+            className="relative pl-10 sm:pl-14"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.6, ease: EASE, delay: i * 0.05 }}
           >
-            <Card hover={false} className="p-6 sm:p-8">
+            {/* Node */}
+            <span className="absolute left-0 top-1.5 h-[13px] w-[13px] rounded-full bg-white border-2 border-ucla-blue" />
 
-              {index < entries.length - 1 && (
-                <div className="absolute left-8 top-full w-0.5 h-6 bg-gray-200 hidden sm:block"></div>
-              )}
-              
-
-              <div className="absolute left-2 top-8 w-4 h-4 bg-[#2774AE] rounded-full border-4 border-white shadow-md hidden sm:block"></div>
-              
-
-              <div className="sm:ml-8">
-
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-                  <div className="mb-3 sm:mb-0">
-                    <h3 className="text-heading-3 text-gray-900 mb-2">
-                      {entry.title}
-                    </h3>
-                    <p className="text-body font-semibold text-[#2774AE]">
-                      {entry.organization}
-                    </p>
-                  </div>
-                  <div className="shrink-0">
-                    <span className="inline-block px-4 py-2 bg-[#2774AE]/10 text-[#2774AE] text-caption font-medium rounded-full border border-[#2774AE]/20">
-                      {entry.period}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="text-gray-700">
-                  <div className="prose-list">
-                    {entry.description
-                      .split('\n')
-                      .filter(line => line.trim() !== '')
-                      .map((line, i) => (
-                        <li key={i} className="text-body-small leading-relaxed">
-                          {line.trim()}
-                        </li>
-                      ))}
-                  </div>
-                </div>
+            <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 mb-4">
+              <div>
+                <h3 className="text-heading-3 text-ink">{entry.title}</h3>
+                <p className="text-body text-ucla-blue font-medium mt-1">
+                  {entry.organization}
+                </p>
               </div>
-            </Card>
+              <span className="shrink-0 inline-flex w-fit px-3 py-1 rounded-full border border-hairline bg-surface text-caption text-ink-faint">
+                {entry.period}
+              </span>
+            </div>
+
+            <ul className="prose-list">
+              {entry.description
+                .split('\n')
+                .filter((line) => line.trim() !== '')
+                .map((line, j) => (
+                  <li key={j} className="text-body-small text-ink-soft">
+                    {line.trim()}
+                  </li>
+                ))}
+            </ul>
           </motion.div>
         ))}
-      </motion.div>
-    );
-  };
+      </div>
+    </div>
+  );
+};
 
-  export default Timeline;
+export default Timeline;
