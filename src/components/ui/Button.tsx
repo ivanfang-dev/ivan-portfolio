@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useMagnetic } from '../../hooks/useMagnetic';
+import { EASE } from '../../utils/motion';
 
 export interface ButtonProps {
-  variant?: 'primary' | 'secondary' | 'outline';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   children: React.ReactNode;
   onClick?: () => void;
@@ -10,7 +12,26 @@ export interface ButtonProps {
   className?: string;
   disabled?: boolean;
   type?: 'button' | 'submit' | 'reset';
+  /** Cursor-magnetic pull — reserve for primary CTAs. */
+  magnetic?: boolean;
+  ariaLabel?: string;
 }
+
+const baseStyles =
+  'relative inline-flex items-center justify-center gap-2 font-medium rounded-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
+
+const variantStyles = {
+  primary: 'bg-ucla-blue text-white hover:bg-accent-hover shadow-sm',
+  secondary: 'bg-white text-ink border border-hairline hover:bg-surface',
+  outline: 'bg-transparent text-ink border border-hairline hover:bg-surface',
+  ghost: 'bg-transparent text-ink hover:text-ucla-blue',
+};
+
+const sizeStyles = {
+  sm: 'px-5 py-2 text-sm',
+  md: 'px-6 py-2.5 text-base',
+  lg: 'px-7 py-3.5 text-base',
+};
 
 const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
@@ -21,103 +42,59 @@ const Button: React.FC<ButtonProps> = ({
   className = '',
   disabled = false,
   type = 'button',
+  magnetic = false,
+  ariaLabel,
 }) => {
-  const [isClicked, setIsClicked] = useState(false);
+  const magnet = useMagnetic<HTMLElement>(0.4);
 
-  const handleClick = () => {
-    setIsClicked(true);
-    setTimeout(() => setIsClicked(false), 200);
-    if (onClick) onClick();
-  };
-
-  const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
-  
-  const variantStyles = {
-    primary: 'bg-[#2774AE] text-white hover:bg-[#1e5a8a] focus:ring-[#2774AE] shadow-md hover:shadow-lg',
-    secondary: 'bg-white text-[#2774AE] border-2 border-[#2774AE] hover:bg-[#2774AE] hover:text-white focus:ring-[#2774AE]',
-    outline: 'bg-transparent text-[#2774AE] border-2 border-[#2774AE] hover:bg-[#2774AE] hover:text-white focus:ring-[#2774AE]'
-  };
-  
-  const sizeStyles = {
-    sm: 'px-4 py-2 text-body-small font-medium',
-    md: 'px-6 py-3 text-body font-medium',
-    lg: 'px-8 py-4 text-body-large font-semibold'
-  };
-  
   const combinedClassName = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`;
-  
-  const buttonContent = (
-    <motion.span
-      className="flex items-center justify-center relative"
-    >
-      {children}
-      
-      {/* Click sparkle effect */}
-      <AnimatePresence>
-        {isClicked && (
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center pointer-events-none"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            {[...Array(6)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute w-1 h-1 bg-white rounded-full"
-                initial={{ 
-                  scale: 0,
-                  x: 0,
-                  y: 0,
-                }}
-                animate={{ 
-                  scale: [0, 1, 0],
-                  x: Math.cos(i * 60 * Math.PI / 180) * 20,
-                  y: Math.sin(i * 60 * Math.PI / 180) * 20,
-                }}
-                transition={{ 
-                  duration: 0.4,
-                  ease: 'easeOut'
-                }}
-              />
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.span>
-  );
-  
+
+  const interaction = disabled
+    ? {}
+    : {
+        whileHover: { scale: variant === 'ghost' ? 1 : 1.02 },
+        whileTap: { scale: 0.97 },
+        transition: { duration: 0.2, ease: EASE },
+      };
+
+  const magneticAttrs = magnetic
+    ? {
+        onMouseMove: magnet.onMouseMove,
+        onMouseLeave: magnet.onMouseLeave,
+        style: magnet.style,
+      }
+    : {};
+
   if (href) {
     return (
       <motion.a
+        ref={magnetic ? (magnet.ref as unknown as React.RefObject<HTMLAnchorElement>) : undefined}
         href={href}
-        target = "_blank"
-        className={`${combinedClassName} relative overflow-hidden`}
-        whileHover={{ 
-          scale: 1.05,
-          boxShadow: '0 10px 25px rgba(39, 116, 174, 0.3)'
-        }}
-        whileTap={{ scale: 0.95 }}
-        onClick={handleClick}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={ariaLabel}
+        className={combinedClassName}
+        onClick={onClick}
+        {...interaction}
+        {...magneticAttrs}
       >
-        {buttonContent}
+        {children}
       </motion.a>
     );
   }
-  
+
   return (
     <motion.button
+      ref={magnetic ? (magnet.ref as unknown as React.RefObject<HTMLButtonElement>) : undefined}
       type={type}
-      className={`${combinedClassName} relative overflow-hidden`}
-      onClick={handleClick}
+      aria-label={ariaLabel}
+      className={combinedClassName}
+      onClick={onClick}
       disabled={disabled}
-      whileHover={disabled ? {} : { 
-        scale: 1.05,
-        boxShadow: '0 10px 25px rgba(39, 116, 174, 0.3)'
-      }}
-      whileTap={disabled ? {} : { scale: 0.95 }}
+      {...interaction}
+      {...magneticAttrs}
     >
-      {buttonContent}
+      {children}
     </motion.button>
   );
 };

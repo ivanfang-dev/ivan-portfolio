@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { EASE } from '../../utils/motion';
 
 export interface SectionProps {
   id?: string;
@@ -20,34 +21,25 @@ const Section: React.FC<SectionProps> = ({
   padding = 'lg',
   animate = true,
 }) => {
-
   const backgroundStyles = {
-    white: 'bg-white',
-    gray: 'bg-gray-50',
-    gradient: 'bg-gradient-to-br from-blue-50 to-white',
+    white: 'bg-canvas',
+    gray: 'bg-surface',
+    gradient: 'bg-gradient-to-b from-surface to-canvas',
   };
-
 
   const paddingStyles = {
-    sm: 'py-8 sm:py-12',
-    md: 'py-12 sm:py-16',
-    lg: 'py-16 sm:py-20',
-    xl: 'py-20 sm:py-24',
+    sm: 'py-12 sm:py-16',
+    md: 'py-16 sm:py-24',
+    lg: 'py-20 sm:py-28',
+    xl: 'py-24 sm:py-36',
   };
 
-
   const sectionVariants = {
-    hidden: {
-      opacity: 0,
-      y: 20,
-    },
+    hidden: { opacity: 0, y: 24 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.6,
-        ease: [0.25, 0.46, 0.45, 0.94] as const,
-      },
+      transition: { duration: 0.7, ease: EASE },
     },
   };
 

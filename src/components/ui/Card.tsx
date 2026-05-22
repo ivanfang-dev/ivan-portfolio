@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { EASE } from '../../utils/motion';
 
 export interface CardProps {
   children: React.ReactNode;
@@ -14,29 +15,23 @@ const Card: React.FC<CardProps> = ({
   hover = true,
   onClick,
 }) => {
-
-  const baseStyles = 'bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden';
-
+  const baseStyles =
+    'bg-white rounded-2xl border border-hairline overflow-hidden';
 
   const hoverVariants = {
     initial: {
-      scale: 1,
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      y: 0,
+      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
     },
     hover: {
-      scale: 1.02,
-      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-      transition: {
-        duration: 0.2,
-        ease: 'easeOut',
-      },
+      y: -6,
+      boxShadow: '0 24px 50px -12px rgba(0, 0, 0, 0.12)',
+      transition: { duration: 0.4, ease: EASE },
     },
   };
 
   const staticVariants = {
-    initial: {
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-    },
+    initial: { boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)' },
   };
 
   const combinedClassName = `${baseStyles} ${className} ${onClick ? 'cursor-pointer' : ''}`;
@@ -46,7 +41,7 @@ const Card: React.FC<CardProps> = ({
       className={combinedClassName}
       variants={hover ? hoverVariants : staticVariants}
       initial="initial"
-      whileHover={hover ? "hover" : undefined}
+      whileHover={hover ? 'hover' : undefined}
       onClick={onClick}
     >
       {children}

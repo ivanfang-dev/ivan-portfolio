@@ -1,15 +1,24 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
 
 @theme {
+  /* Neutral foundation (Apple-grade ink + off-white surfaces) */
+  --color-ink: #1d1d1f;
+  --color-ink-soft: #6e6e73;
+  --color-ink-faint: #86868b;
+  --color-canvas: #ffffff;
+  --color-surface: #f5f5f7;
+  --color-surface-2: #fafafa;
+  --color-hairline: #e8e8ed;
+
+  /* Accent — used sparingly for CTAs / emphasis only */
   --color-ucla-blue: #2774ae;
+  --color-accent-hover: #1e5a8a;
   --color-ucla-gold: #ffd100;
-  --color-ucla-dark-blue: #003b5c;
-  --color-ucla-light-blue: #8bb8e8;
 }
 
 :root {
-  /* Enhanced Typography System */
+  /* Typography */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   line-height: 1.6;
   font-weight: 400;
@@ -18,8 +27,8 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-  
-  /* Typography Scale - More refined spacing */
+
+  /* Type scale */
   --font-size-xs: 0.75rem;    /* 12px */
   --font-size-sm: 0.875rem;   /* 14px */
   --font-size-base: 1rem;     /* 16px */
@@ -31,27 +40,28 @@
   --font-size-5xl: 3rem;      /* 48px */
   --font-size-6xl: 3.75rem;   /* 60px */
   --font-size-7xl: 4.5rem;    /* 72px */
-  
-  /* Line Heights - Better vertical rhythm */
+
+  /* Line heights */
   --leading-none: 1;
-  --leading-tight: 1.25;
-  --leading-snug: 1.375;
+  --leading-tight: 1.1;
+  --leading-snug: 1.3;
   --leading-normal: 1.5;
   --leading-relaxed: 1.625;
-  --leading-loose: 2;
-  
-  /* Letter Spacing - More refined */
-  --tracking-tighter: -0.05em;
+
+  /* Letter spacing */
+  --tracking-tighter: -0.045em;
   --tracking-tight: -0.025em;
   --tracking-normal: 0em;
-  --tracking-wide: 0.025em;
-  --tracking-wider: 0.05em;
-  --tracking-widest: 0.1em;
+  --tracking-wide: 0.04em;
+  --tracking-widest: 0.18em;
+
+  /* Cinematic easing — single curve used site-wide */
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html {
   scroll-behavior: auto;
-  font-size: 16px; /* Base font size */
+  font-size: 16px;
 }
 
 body {
@@ -59,15 +69,25 @@ body {
   min-width: 320px;
   min-height: 100vh;
   overflow-x: hidden;
-  color: #1f2937; /* Better default text color */
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
   line-height: var(--leading-relaxed);
 }
 
-/* Professional Typography Classes */
+/* ===== Typography ===== */
+
+/* Oversized cinematic display — fluid, used by the hero */
+.text-hero {
+  font-size: clamp(3rem, 11.5vw, 11rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+}
+
 .text-display-1 {
   font-size: var(--font-size-7xl);
   font-weight: 800;
-  line-height: var(--leading-none);
+  line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tighter);
 }
 
@@ -79,7 +99,7 @@ body {
 }
 
 .text-display-3 {
-  font-size: var(--font-size-5xl);
+  font-size: clamp(2.25rem, 5vw, var(--font-size-5xl));
   font-weight: 700;
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
@@ -103,7 +123,7 @@ body {
   font-size: var(--font-size-2xl);
   font-weight: 600;
   line-height: var(--leading-snug);
-  letter-spacing: var(--tracking-normal);
+  letter-spacing: var(--tracking-tight);
 }
 
 .text-body-large {
@@ -127,19 +147,19 @@ body {
   letter-spacing: var(--tracking-normal);
 }
 
+/* Eyebrow / section label */
 .text-caption {
   font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-weight: 600;
   line-height: var(--leading-normal);
-  letter-spacing: var(--tracking-wide);
+  letter-spacing: var(--tracking-widest);
   text-transform: uppercase;
 }
 
-/* Responsive Typography */
+/* Responsive type */
 @media (max-width: 640px) {
   .text-display-1 { font-size: var(--font-size-5xl); }
   .text-display-2 { font-size: var(--font-size-4xl); }
-  .text-display-3 { font-size: var(--font-size-3xl); }
   .text-heading-1 { font-size: var(--font-size-2xl); }
   .text-heading-2 { font-size: var(--font-size-xl); }
   .text-body-large { font-size: var(--font-size-lg); }
@@ -150,7 +170,14 @@ body {
   .text-display-2 { font-size: 4rem; }
 }
 
-/* Enhanced List Styling */
+/* ===== Kinetic typography helper ===== */
+/* Wrap a line of text; its child translates up from 100% for a mask reveal */
+.line-mask {
+  display: block;
+  overflow: hidden;
+}
+
+/* ===== Lists ===== */
 .prose-list {
   list-style: none;
   padding-left: 0;
@@ -164,17 +191,17 @@ body {
 }
 
 .prose-list li::before {
-  content: '▸';
+  content: '';
   position: absolute;
   left: 0;
-  top: 0;
-  color: #2774ae;
-  font-weight: 600;
-  font-size: 0.875rem;
-  line-height: inherit;
+  top: 0.7em;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--color-ucla-blue);
 }
 
-/* Better alignment for icons and text */
+/* ===== Layout helpers ===== */
 .flex-align-center {
   display: flex;
   align-items: center;
@@ -187,36 +214,8 @@ body {
   gap: 0.75rem;
 }
 
-/* Ensure proper section spacing */
 section {
   scroll-margin-top: 80px;
-}
-
-/* Improved focus states for accessibility */
-*:focus {
-  outline: 2px solid #2774AE;
-  outline-offset: 2px;
-}
-
-/* Remove focus outlines from navbar buttons */
-nav button:focus,
-nav button:focus-visible,
-nav button:active {
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  -webkit-tap-highlight-color: transparent !important;
-}
-
-/* Enhanced button hover states */
-button:hover {
-  transform: translateY(-1px);
-  transition: all 0.2s ease-in-out;
-}
-
-/* Smooth transitions for all interactive elements */
-a, button, input, textarea, select {
-  transition: all 0.2s ease-in-out;
 }
 
 .container {
@@ -228,56 +227,32 @@ a, button, input, textarea, select {
 }
 
 @media (min-width: 640px) {
-  .container {
-    max-width: 640px;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
+  .container { max-width: 640px; padding-left: 1.5rem; padding-right: 1.5rem; }
 }
-
 @media (min-width: 768px) {
-  .container {
-    max-width: 768px;
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
+  .container { max-width: 768px; padding-left: 2rem; padding-right: 2rem; }
+}
+@media (min-width: 1024px) { .container { max-width: 1024px; } }
+@media (min-width: 1280px) { .container { max-width: 1280px; } }
+@media (min-width: 1536px) { .container { max-width: 1536px; } }
+
+/* ===== Film grain overlay ===== */
+/* Apply to an absolutely-positioned element to add subtle cinematic texture */
+.bg-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
 }
 
-@media (min-width: 1024px) {
-  .container {
-    max-width: 1024px;
-  }
+/* ===== Focus (accessible, unobtrusive) ===== */
+*:focus { outline: none; }
+*:focus-visible {
+  outline: 2px solid var(--color-ucla-blue);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
-@media (min-width: 1280px) {
-  .container {
-    max-width: 1280px;
-  }
-}
-
-@media (min-width: 1536px) {
-  .container {
-    max-width: 1536px;
-  }
-}
-
-/* Enhanced card hover effects */
-.card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-/* Improved animation performance */
-* {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Reduce motion for users who prefer it */
+/* ===== Reduced motion ===== */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

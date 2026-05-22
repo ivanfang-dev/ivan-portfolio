@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useNavigationScrollSpy } from '../../hooks/useScrollSpy';
 import { scrollToSection } from '../../utils/smoothScroll';
+import Button from '../ui/Button';
 
 export interface NavItem {
   id: string;
@@ -28,13 +29,10 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
     { id: 'resume', label: 'Resume', href: '#resume' },
   ];
 
-  const activeSection = useNavigationScrollSpy(navItems.map(item => item.id));
+  const activeSection = useNavigationScrollSpy(navItems.map((item) => item.id));
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -42,11 +40,10 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
   const handleNavClick = async (sectionId: string) => {
     setIsMobileMenuOpen(false);
     setPendingSection(sectionId);
-    
     try {
       await scrollToSection(sectionId);
     } finally {
-      setTimeout(() => setPendingSection(null), 2000); 
+      setTimeout(() => setPendingSection(null), 2000);
     }
   };
 
@@ -58,15 +55,14 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
         setIsMobileMenuOpen(false);
       }
     };
-
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, [isMobileMenuOpen]);
 
   return (
     <motion.nav
-      className={`fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md transition-all duration-300 ${
-        isScrolled ? 'shadow-sm border-b border-gray-100' : ''
+      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
+        isScrolled ? 'bg-white/70 backdrop-blur-xl border-b border-hairline' : 'bg-transparent'
       } ${className}`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -75,49 +71,43 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <motion.div
-            className="shrink-0"
+          <motion.button
+            onClick={() => handleNavClick('hero')}
+            className="text-heading-3 font-semibold text-ink hover:text-ucla-blue transition-colors"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <button
-              onClick={() => handleNavClick('hero')}
-              className="text-heading-3 font-semibold text-[#2774AE] hover:text-[#1e5a8a] transition-colors duration-300 focus:outline-none"
-              style={{ 
-                outline: 'none !important', 
-                border: 'none !important', 
-                boxShadow: 'none !important',
-                WebkitTapHighlightColor: 'transparent'
-              }}
-            >
-              Ivan Fang
-            </button>
-          </motion.div>
+            Ivan Fang
+          </motion.button>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-1">
-              {navItems.map((item) => (
-                <motion.button
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center gap-1">
+            {navItems.map((item) => {
+              const active = displayActiveSection === item.id;
+              return (
+                <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`px-4 py-2 text-body-small font-medium transition-all duration-300 relative rounded-lg ${
-                    displayActiveSection === item.id
-                      ? 'text-[#2774AE]'
-                      : 'text-gray-600 hover:text-[#2774AE] hover:bg-gray-50/50'
+                  className={`relative px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                    active ? 'text-ink' : 'text-ink-soft hover:text-ink'
                   }`}
-                  style={{ 
-                    outline: 'none !important', 
-                    border: 'none !important', 
-                    boxShadow: 'none !important',
-                    WebkitTapHighlightColor: 'transparent'
-                  }}
-                  whileHover={{ y: -1 }}
-                  whileTap={{ scale: 0.98 }}
                 >
-                  {item.label}
-                </motion.button>
-              ))}
+                  {active && (
+                    <motion.span
+                      layoutId="nav-active"
+                      className="absolute inset-0 rounded-full bg-ink/[0.06]"
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10">{item.label}</span>
+                </button>
+              );
+            })}
+
+            <div className="ml-3">
+              <Button variant="primary" size="sm" magnetic onClick={() => handleNavClick('contact')}>
+                Get in touch
+              </Button>
             </div>
           </div>
 
@@ -125,59 +115,50 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
           <div className="md:hidden">
             <motion.button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-lg text-gray-600 hover:text-[#2774AE] hover:bg-gray-50 transition-colors duration-200 focus:outline-none"
-              style={{ 
-                outline: 'none !important', 
-                border: 'none !important', 
-                boxShadow: 'none !important',
-                WebkitTapHighlightColor: 'transparent'
-              }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              className="inline-flex items-center justify-center p-2 rounded-lg text-ink hover:text-ucla-blue transition-colors"
+              whileTap={{ scale: 0.95 }}
+              aria-label="Toggle navigation menu"
             >
-              <span className="sr-only">Open main menu</span>
               {isMobileMenuOpen ? (
-                <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                <XMarkIcon className="h-6 w-6" aria-hidden="true" />
               ) : (
-                <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                <Bars3Icon className="h-6 w-6" aria-hidden="true" />
               )}
             </motion.button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Navigation */}
+      {/* Mobile menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            className="md:hidden mobile-menu"
+            className="md:hidden mobile-menu overflow-hidden"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
           >
-            <div className="px-4 pt-2 pb-4 space-y-1 bg-white/95 backdrop-blur-md border-t border-gray-100">
+            <div className="px-4 pt-2 pb-5 space-y-1 bg-white/90 backdrop-blur-xl border-t border-hairline">
               {navItems.map((item) => (
-                <motion.button
+                <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`block w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 focus:outline-none ${
+                  className={`block w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-colors ${
                     displayActiveSection === item.id
-                      ? 'text-[#2774AE]'
-                      : 'text-gray-600 hover:text-[#2774AE] hover:bg-gray-50'
+                      ? 'text-ucla-blue bg-surface'
+                      : 'text-ink-soft hover:text-ink hover:bg-surface'
                   }`}
-                  style={{ 
-                    outline: 'none !important', 
-                    border: 'none !important', 
-                    boxShadow: 'none !important',
-                    WebkitTapHighlightColor: 'transparent'
-                  }}
-                  whileHover={{ x: 2 }}
-                  whileTap={{ scale: 0.98 }}
                 >
                   {item.label}
-                </motion.button>
+                </button>
               ))}
+              <button
+                onClick={() => handleNavClick('contact')}
+                className="block w-full text-left px-4 py-3 rounded-lg text-base font-medium text-white bg-ucla-blue hover:bg-accent-hover transition-colors mt-2"
+              >
+                Get in touch
+              </button>
             </div>
           </motion.div>
         )}
