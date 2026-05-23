@@ -4,77 +4,64 @@ export interface SmoothScrollOptions {
   offset?: number;
 }
 
-
 const easingFunctions = {
   linear: (t: number): number => t,
-  easeInOut: (t: number): number => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+  easeInOut: (t: number): number => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
   easeOut: (t: number): number => t * (2 - t),
   easeIn: (t: number): number => t * t,
 };
 
-
+/**
+ * Smoothly scrolls to a target. For element/selector targets the destination is
+ * recomputed every frame (and snapped at the end) so the scroll still lands
+ * correctly even if content above it changes height mid-animation — e.g. lazy
+ * images, web-font swap, scroll-reveal elements, or the async résumé PDF.
+ */
 const smoothScrollTo = (
   target: string | Element | number,
   options: SmoothScrollOptions = {}
 ): Promise<void> => {
-  const {
-    duration = 800,
-    easing = easingFunctions.easeInOut,
-    offset = 0,
-  } = options;
+  const { duration = 800, easing = easingFunctions.easeInOut, offset = 0 } = options;
 
   return new Promise((resolve) => {
-    let targetY: number;
+    const getTargetY = (): number | null => {
+      if (typeof target === 'number') return target;
 
-
-    if (typeof target === 'number') {
-      targetY = target;
-    } else if (typeof target === 'string') {
-      const element = document.querySelector(target);
-      if (!element) {
-        console.warn(`Element with selector "${target}" not found`);
-        resolve();
-        return;
+      let element: Element | null = null;
+      if (typeof target === 'string') {
+        element = document.querySelector(target);
+      } else if (target instanceof Element) {
+        element = target;
       }
-      targetY = element.getBoundingClientRect().top + window.pageYOffset - offset;
-    } else if (target instanceof Element) {
-      targetY = target.getBoundingClientRect().top + window.pageYOffset - offset;
-    } else {
-      console.warn('Invalid target provided to smoothScrollTo');
+
+      if (!element) return null;
+      return element.getBoundingClientRect().top + window.scrollY - offset;
+    };
+
+    const initialTarget = getTargetY();
+    if (initialTarget === null) {
+      console.warn(`smoothScrollTo: target "${String(target)}" not found`);
       resolve();
       return;
     }
 
-    const startY = window.pageYOffset;
-    const difference = targetY - startY;
+    const startY = window.scrollY;
     const startTime = performance.now();
-
-
-    const supportsNativeSmooth = 'scrollBehavior' in document.documentElement.style;
-
-
-    if (supportsNativeSmooth && easing === easingFunctions.linear) {
-      window.scrollTo({
-        top: targetY,
-        behavior: 'smooth',
-      });
-
-      setTimeout(() => resolve(), duration);
-      return;
-    }
-
 
     const animateScroll = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const easedProgress = easing(progress);
 
-      const currentY = startY + (difference * easedProgress);
-      window.scrollTo(0, currentY);
+      // Recompute live each frame so layout shifts above the target don't throw off the landing.
+      const targetY = getTargetY() ?? initialTarget;
+      window.scrollTo(0, startY + (targetY - startY) * easedProgress);
 
       if (progress < 1) {
         requestAnimationFrame(animateScroll);
       } else {
+        // Final snap to the live position.
+        window.scrollTo(0, getTargetY() ?? targetY);
         resolve();
       }
     };
@@ -83,15 +70,14 @@ const smoothScrollTo = (
   });
 };
 
-
-export const scrollToSection = (sectionId: string, offset: number = 80): Promise<void> => {
+// Matches the fixed navbar height (h-16 = 64px) so sections land flush beneath it.
+export const scrollToSection = (sectionId: string, offset: number = 64): Promise<void> => {
   return smoothScrollTo(`#${sectionId}`, {
-    duration: 500, // Reduced from 800ms to 500ms for faster navigation
-    easing: easingFunctions.easeOut, // Changed to easeOut for snappier feel
+    duration: 500,
+    easing: easingFunctions.easeOut,
     offset,
   });
 };
-
 
 export const scrollToTop = (options: SmoothScrollOptions = {}): Promise<void> => {
   return smoothScrollTo(0, {

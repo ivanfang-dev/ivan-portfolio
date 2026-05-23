@@ -96,7 +96,7 @@ const Footer: React.FC<FooterProps> = ({ className = '' }) => {
             <span aria-hidden>→</span>
           </motion.a>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center sm:justify-start gap-3">
             {socialLinks.map((social) => {
               const Icon = social.icon;
               return (
@@ -118,11 +118,11 @@ const Footer: React.FC<FooterProps> = ({ className = '' }) => {
         </div>
 
         <div className="mt-20 pt-8 border-t border-hairline flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-body-small text-ink-faint">
+          <p className="text-body-small text-ink-faint text-center sm:text-left">
             © {currentYear} Ivan Fang. All rights reserved.
           </p>
-          <p className="text-body-small text-ink-faint">
-            Built with React, Tailwind & Framer Motion.
+          <p className="text-body-small text-ink-faint text-center sm:text-right">
+            Built with ❤️ (along with React, Tailwind & Framer Motion)
           </p>
         </div>
       </div>

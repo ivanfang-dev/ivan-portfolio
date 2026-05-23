@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { Button, Section, SectionHeader, ExplosiveImage } from '../index';
 import { scrollToSection } from '../../utils/smoothScroll';
@@ -8,7 +8,6 @@ export interface AboutProps {
   content?: string;
 }
 
-const focusAreas = ['Full-stack', 'Frontend systems', 'Education tech', 'Entrepreneurship'];
 
 const About: React.FC<AboutProps> = ({
   content = `Hailing from the sunny shores of Singapore, I'm a computer science student at UCLA fascinated by the intersection of technology, education, and entrepreneurship. As the founder of LionCity Tutors, I've seen firsthand how software can make learning more accessible for students across Singapore.
@@ -19,6 +18,9 @@ When I'm not coding or studying, you'll find me reading, or doomscrolling in bed
 }) => {
   const imgRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+  // After the reveal wipe finishes, expand the clip region past the box so the
+  // "Try clicking me!" hint and explosion particles aren't clipped to its edges.
+  const [revealed, setRevealed] = useState(false);
 
   const { scrollYProgress } = useScroll({
     target: imgRef,
@@ -41,14 +43,15 @@ When I'm not coding or studying, you'll find me reading, or doomscrolling in bed
         {/* Image */}
         <div ref={imgRef} className="flex justify-center lg:justify-start">
           <motion.div
-            className="relative w-full max-w-md overflow-hidden rounded-[2rem] ring-1 ring-hairline shadow-2xl"
+            className="relative w-full max-w-md"
             initial={{ clipPath: 'inset(0 0 100% 0)' }}
-            whileInView={{ clipPath: 'inset(0 0 0% 0)' }}
+            whileInView={{ clipPath: revealed ? 'inset(-100% -100% -100% -100%)' : 'inset(0 0 0% 0)' }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.9, ease: EASE }}
+            onAnimationComplete={() => setRevealed(true)}
             style={reduce ? undefined : { y: parallax }}
           >
-            <div className="aspect-[4/5] bg-gradient-to-br from-ucla-blue/12 via-surface to-surface-2 flex items-center justify-center">
+            <div className="aspect-[4/5] flex items-center justify-center">
               <ExplosiveImage
                 src={`${import.meta.env.BASE_URL}IMG_1957-modified.png`}
                 alt="Ivan Fang"
@@ -65,7 +68,7 @@ When I'm not coding or studying, you'll find me reading, or doomscrolling in bed
         <div className="text-center lg:text-left">
           <SectionHeader
             eyebrow="About"
-            title="A builder from Singapore."
+            title="A builder from Singapore, now at UCLA!"
             align="left"
             className="lg:items-start"
             titleClassName="text-display-3 text-ink"
@@ -83,18 +86,7 @@ When I'm not coding or studying, you'll find me reading, or doomscrolling in bed
                 {paragraph}
               </motion.p>
             ))}
-
-            <motion.div variants={item} className="flex flex-wrap gap-2.5 justify-center lg:justify-start pt-2">
-              {focusAreas.map((area) => (
-                <span
-                  key={area}
-                  className="px-4 py-1.5 rounded-full border border-hairline bg-white text-body-small text-ink-soft"
-                >
-                  {area}
-                </span>
-              ))}
-            </motion.div>
-
+            
             <motion.div variants={item} className="pt-4 flex justify-center lg:justify-start">
               <Button variant="primary" size="lg" magnetic onClick={() => scrollToSection('contact')}>
                 Get in touch
