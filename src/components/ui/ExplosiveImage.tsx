@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import confetti from 'canvas-confetti';
 
 interface ExplosiveImageProps {
   src: string;
@@ -21,7 +22,6 @@ const ExplosiveImage: React.FC<ExplosiveImageProps> = ({
   const [clickCount, setClickCount] = useState(0);
   const [isExploded, setIsExploded] = useState(false);
   const [showSurprise, setShowSurprise] = useState(false);
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const [showHint, setShowHint] = useState(false);
 
   const handleClick = useCallback(() => {
@@ -36,13 +36,19 @@ const ExplosiveImage: React.FC<ExplosiveImageProps> = ({
     }
 
     if (newClickCount >= explosionThreshold && !isExploded) {
-      const newParticles = Array.from({ length: 20 }, (_, i) => ({
-        id: i,
-        x: Math.random() * 400 - 200,
-        y: Math.random() * 400 - 200,
-      }));
+      // Confetti burst centered on the image (skipped under reduced motion).
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (element && !prefersReduced) {
+        const rect = element.getBoundingClientRect();
+        const origin = {
+          x: (rect.left + rect.width / 2) / window.innerWidth,
+          y: (rect.top + rect.height / 2) / window.innerHeight,
+        };
+        const colors = ['#2774ae', '#ffd100', '#8bb8e8', '#ffffff'];
+        confetti({ particleCount: 220, spread: 80, startVelocity: 45, origin, colors, scalar: 0.9, zIndex: 9999 });
+        confetti({ particleCount: 160, spread: 120, startVelocity: 30, origin, colors, scalar: 0.7, zIndex: 9999 });
+      }
 
-      setParticles(newParticles);
       setIsExploded(true);
 
       setTimeout(() => setShowSurprise(true), 800);
@@ -50,7 +56,6 @@ const ExplosiveImage: React.FC<ExplosiveImageProps> = ({
         setIsExploded(false);
         setShowSurprise(false);
         setClickCount(0);
-        setParticles([]);
       }, 8000);
     }
   }, [clickCount, explosionThreshold, isExploded]);
@@ -143,20 +148,6 @@ const ExplosiveImage: React.FC<ExplosiveImageProps> = ({
           }}
           transition={{ duration: 0.5 }}
         />
-
-        <AnimatePresence>
-          {isExploded &&
-            particles.map((p) => (
-              <motion.div
-                key={p.id}
-                className="absolute w-4 h-4 from-yellow-400 to-red-500 rounded-full"
-                style={{ top: '50%', left: '50%' }}
-                initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
-                animate={{ x: p.x, y: p.y, scale: [0, 1, 0], opacity: [1, 1, 0] }}
-                transition={{ duration: 1, ease: 'easeOut' }}
-              />
-            ))}
-        </AnimatePresence>
 
         {showSurprise && (
           <motion.div

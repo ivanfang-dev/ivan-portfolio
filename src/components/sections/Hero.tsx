@@ -1,12 +1,20 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
-import { Button, RevealText } from '../index';
+import { Button, RevealText, Typewriter } from '../index';
 import { scrollToSection } from '../../utils/smoothScroll';
 import { EASE } from '../../utils/motion';
 
 export interface HeroProps {
   onCTAClick?: () => void;
 }
+
+// Lines the hero tagline cycles through. Keep them short so they stay on one line.
+const TAGLINES = [
+  'I love anything software 💙💛',
+  'I build full-stack web apps.',
+  'I ship polished products.',
+  'Currently studying CS @ UCLA.',
+];
 
 const Hero: React.FC<HeroProps> = ({ onCTAClick }) => {
   const ref = useRef<HTMLElement>(null);
@@ -21,7 +29,6 @@ const Hero: React.FC<HeroProps> = ({ onCTAClick }) => {
   const y = useTransform(scrollYProgress, [0, 1], [0, 140]);
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.96]);
-  const bloomY = useTransform(scrollYProgress, [0, 1], [0, -80]);
 
   const handleViewWork = () => {
     if (onCTAClick) onCTAClick();
@@ -46,22 +53,6 @@ const Hero: React.FC<HeroProps> = ({ onCTAClick }) => {
       id="hero"
       className="relative min-h-screen flex items-center overflow-hidden bg-canvas"
     >
-      {/* Ambient blue blooms */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={reduce ? undefined : { y: bloomY }}
-      >
-        <div
-          className="absolute -top-40 -left-24 h-[42rem] w-[42rem] rounded-full blur-3xl opacity-70"
-          style={{ background: 'radial-gradient(circle, rgba(39,116,174,0.18), transparent 70%)' }}
-        />
-        <div
-          className="absolute top-1/3 -right-32 h-[36rem] w-[36rem] rounded-full blur-3xl opacity-60"
-          style={{ background: 'radial-gradient(circle, rgba(139,184,232,0.22), transparent 70%)' }}
-        />
-      </motion.div>
-
       {/* Faint grid, masked to fade at the edges */}
       <div
         aria-hidden
@@ -79,6 +70,16 @@ const Hero: React.FC<HeroProps> = ({ onCTAClick }) => {
       <div
         aria-hidden
         className="bg-grain pointer-events-none absolute inset-0 opacity-[0.12] mix-blend-multiply"
+      />
+
+      {/* Vignette — subtle darkened edges for a filmic frame */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(115% 115% at 50% 42%, transparent 60%, rgba(15,23,42,0.16) 100%)',
+        }}
       />
 
       {/* Content */}
@@ -107,12 +108,8 @@ const Hero: React.FC<HeroProps> = ({ onCTAClick }) => {
         />
 
         <motion.div variants={stagger} initial="hidden" animate="visible" className="mt-8 max-w-2xl">
-          <motion.p variants={item} className="text-heading-2 text-ink font-medium">
-            I love anything software.
-          </motion.p>
-          <motion.p variants={item} className="text-body-large text-ink-soft mt-4">
-            Founder of LionCity Tutors, builder of products at the intersection of
-            technology, education, and entrepreneurship.
+          <motion.p variants={item} className="text-heading-2 text-ink font-medium min-h-[1.4em]">
+            <Typewriter phrases={TAGLINES} />
           </motion.p>
 
           <motion.div variants={item} className="mt-10 flex flex-wrap items-center gap-4">
@@ -125,22 +122,6 @@ const Hero: React.FC<HeroProps> = ({ onCTAClick }) => {
             </Button>
           </motion.div>
         </motion.div>
-      </motion.div>
-
-      {/* Scroll cue */}
-      <motion.div
-        aria-hidden
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.1, duration: 0.8 }}
-      >
-        <span className="text-caption text-ink-faint">Scroll</span>
-        <motion.span
-          className="block h-10 w-px origin-top bg-gradient-to-b from-ink-faint to-transparent"
-          animate={reduce ? undefined : { scaleY: [0.4, 1, 0.4] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        />
       </motion.div>
     </section>
   );
