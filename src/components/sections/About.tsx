@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
+import { motion, useScroll, useTransform, useReducedMotion, useInView } from 'framer-motion';
 import { Button, Section, SectionHeader, ExplosiveImage } from '../index';
 import { scrollToSection } from '../../utils/smoothScroll';
 import { EASE } from '../../utils/motion';
@@ -21,6 +21,10 @@ When I'm not coding or studying, you'll find me reading, or doomscrolling in bed
   // After the reveal wipe finishes, expand the clip region past the box so the
   // "Try clicking me!" hint and explosion particles aren't clipped to its edges.
   const [revealed, setRevealed] = useState(false);
+  // Track visibility on this outer wrapper rather than on the clipped box itself:
+  // the initial `inset(0 0 100% 0)` clip makes the box's intersection ratio 0, so a
+  // whileInView on it would never fire and the wipe would never start.
+  const inView = useInView(imgRef, { once: true, margin: '-80px' });
 
   const { scrollYProgress } = useScroll({
     target: imgRef,
@@ -44,11 +48,15 @@ When I'm not coding or studying, you'll find me reading, or doomscrolling in bed
         <div ref={imgRef} className="flex justify-center lg:justify-start">
           <motion.div
             className="relative w-full max-w-md"
-            initial={{ clipPath: 'inset(0 0 100% 0)' }}
-            whileInView={{ clipPath: revealed ? 'inset(-100% -100% -100% -100%)' : 'inset(0 0 0% 0)' }}
-            viewport={{ once: true, margin: '-80px' }}
+            variants={{
+              hidden: { clipPath: 'inset(0 0 100% 0)' },
+              visible: { clipPath: 'inset(0 0 0% 0)' },
+              expanded: { clipPath: 'inset(-100% -100% -100% -100%)' },
+            }}
+            initial="hidden"
+            animate={!inView ? 'hidden' : revealed ? 'expanded' : 'visible'}
             transition={{ duration: 0.9, ease: EASE }}
-            onAnimationComplete={() => setRevealed(true)}
+            onAnimationComplete={() => { if (inView) setRevealed(true); }}
             style={reduce ? undefined : { y: parallax }}
           >
             <div className="aspect-[4/5] flex items-center justify-center">
