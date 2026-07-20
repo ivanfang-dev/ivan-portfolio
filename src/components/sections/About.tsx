@@ -61,11 +61,11 @@ When I'm not coding or studying, you'll find me reading, or doomscrolling in bed
           >
             <div className="aspect-[4/5] flex items-center justify-center">
               <ExplosiveImage
-                src={`${import.meta.env.BASE_URL}IMG_1957-modified.png`}
+                src={`${import.meta.env.BASE_URL}ivan-photo.webp`}
                 alt="Ivan Fang"
                 className="w-full h-full"
                 explosionThreshold={5}
-                surpriseImage={`${import.meta.env.BASE_URL}IMG_5788-modified.png`}
+                surpriseImage={`${import.meta.env.BASE_URL}ivan-surprise.webp`}
                 objectFit="contain"
               />
             </div>
@@ -75,7 +75,6 @@ When I'm not coding or studying, you'll find me reading, or doomscrolling in bed
         {/* Text */}
         <div className="text-center lg:text-left">
           <SectionHeader
-            eyebrow="About"
             title="A builder from Singapore, now at UCLA!"
             align="left"
             className="lg:items-start"

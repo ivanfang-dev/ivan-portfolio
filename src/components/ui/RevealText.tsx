@@ -25,6 +25,8 @@ export interface RevealTextProps {
   duration?: number;
   trigger?: 'load' | 'inView';
   once?: boolean;
+  /** Rendered inline after the last unit, inside its own mask so it joins the stagger. */
+  suffix?: React.ReactNode;
 }
 
 /**
@@ -41,13 +43,19 @@ const RevealText: React.FC<RevealTextProps> = ({
   duration = 0.8,
   trigger = 'inView',
   once = true,
+  suffix,
 }) => {
   const reduce = useReducedMotion();
   const Wrapper = TAGS[as];
 
   if (reduce) {
     const Plain = as as React.ElementType;
-    return <Plain className={className}>{text}</Plain>;
+    return (
+      <Plain className={className}>
+        {text}
+        {suffix}
+      </Plain>
+    );
   }
 
   const units = split === 'lines' ? text.split('\n') : text.split(' ');
@@ -73,6 +81,7 @@ const RevealText: React.FC<RevealTextProps> = ({
           <span key={i} className="line-mask">
             <motion.span className="block will-change-transform" variants={child}>
               {unit || ' '}
+              {i === units.length - 1 && suffix}
             </motion.span>
           </span>
         ) : (
@@ -83,6 +92,7 @@ const RevealText: React.FC<RevealTextProps> = ({
             >
               <motion.span className="inline-block will-change-transform" variants={child}>
                 {unit}
+                {i === units.length - 1 && suffix}
               </motion.span>
             </span>{' '}
           </React.Fragment>

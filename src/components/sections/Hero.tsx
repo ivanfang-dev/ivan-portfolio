@@ -88,12 +88,11 @@ const Hero: React.FC<HeroProps> = ({ onCTAClick }) => {
         style={contentStyle}
       >
         <motion.span
-          className="text-caption text-ink-faint flex items-center gap-3 mb-7"
+          className="text-body-small font-medium text-ink-soft block mb-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
         >
-          <span className="inline-block h-px w-8 bg-ink-faint/50" />
           Computer Scientist · UCLA
         </motion.span>
 
@@ -116,7 +115,12 @@ const Hero: React.FC<HeroProps> = ({ onCTAClick }) => {
             <Button variant="primary" size="lg" magnetic onClick={handleViewWork}>
               View My Work
             </Button>
-            <Button variant="ghost" size="lg" className="group" onClick={() => scrollToSection('resume')}>
+            <Button
+              variant="ghost"
+              size="lg"
+              className="group"
+              href={`${import.meta.env.BASE_URL}Ivan_Fang_Resume.pdf`}
+            >
               Resume
               <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
             </Button>

@@ -1,32 +1,39 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import '@fontsource-variable/bricolage-grotesque';
 @import "tailwindcss";
 
 @theme {
-  /* Neutral foundation (Apple-grade ink + off-white surfaces) */
-  --color-ink: #1d1d1f;
-  --color-ink-soft: #6e6e73;
-  --color-ink-faint: #86868b;
-  --color-canvas: #ffffff;
-  --color-surface: #f5f5f7;
-  --color-surface-2: #fafafa;
-  --color-hairline: #e8e8ed;
+  /* Neutral foundation — blue-tinted toward the brand hue (OKLCH).
+     Every text/background pair below is verified ≥ WCAG AA. */
+  --color-ink: oklch(24% 0.02 260);          /* #1a2029 */
+  --color-ink-soft: oklch(45% 0.02 255);     /* #4e5661 · 7.3:1 on canvas */
+  --color-ink-faint: oklch(54% 0.02 253);    /* #67707a · 4.9:1 on canvas */
+  --color-canvas: oklch(99.3% 0.002 250);    /* #fcfdfe */
+  --color-surface: oklch(96.5% 0.005 250);   /* #f1f4f7 */
+  --color-surface-2: oklch(97.8% 0.004 250); /* #f6f8fa */
+  --color-hairline: oklch(92% 0.008 250);    /* #e1e5ea */
 
-  /* Accent — used sparingly for CTAs / emphasis only */
+  /* Brand — committed strategy: blue carries surfaces, not just buttons */
   --color-ucla-blue: #2774ae;
-  --color-accent-hover: #1e5a8a;
+  --color-accent-hover: oklch(47% 0.1 248);  /* #255e90 */
+  --color-navy: oklch(30% 0.062 252);        /* #142f4c — drenched contact surface */
+  --color-navy-ink: oklch(87% 0.03 250);     /* #c6d6e8 · 9.2:1 on navy */
+  --color-navy-faint: oklch(75% 0.045 250);  /* #99b1ca · 6.2:1 on navy */
   --color-ucla-gold: #ffd100;
+  --color-gold-hover: oklch(85% 0.17 95);
 }
 
 :root {
-  /* Typography */
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  /* Typography — Bricolage Grotesque (display voice) over a native body stack */
+  --font-display: 'Bricolage Grotesque Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   line-height: 1.6;
   font-weight: 400;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  font-kerning: normal;
+  font-optical-sizing: auto;
 
   /* Type scale */
   --font-size-xs: 0.75rem;    /* 12px */
@@ -48,12 +55,11 @@
   --leading-normal: 1.5;
   --leading-relaxed: 1.625;
 
-  /* Letter spacing */
-  --tracking-tighter: -0.045em;
-  --tracking-tight: -0.025em;
+  /* Letter spacing — Bricolage carries its own character; keep tracking gentle */
+  --tracking-tight: -0.02em;
   --tracking-normal: 0em;
   --tracking-wide: 0.04em;
-  --tracking-widest: 0.18em;
+  --tracking-widest: 0.14em;
 
   /* Cinematic easing — single curve used site-wide */
   --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
@@ -76,36 +82,45 @@ body {
 
 /* ===== Typography ===== */
 
-/* Oversized cinematic display — fluid, used by the hero */
+h1, h2, h3 {
+  text-wrap: balance;
+}
+
+/* Oversized display — fluid, used by the hero */
 .text-hero {
-  font-size: clamp(3rem, 11.5vw, 11rem);
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 7vw, 5.5rem);
   font-weight: 800;
-  line-height: 0.92;
-  letter-spacing: -0.045em;
+  line-height: 0.98;
+  letter-spacing: var(--tracking-tight);
 }
 
 .text-display-1 {
-  font-size: var(--font-size-7xl);
+  font-family: var(--font-display);
+  font-size: var(--font-size-6xl);
   font-weight: 800;
   line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tighter);
+  letter-spacing: var(--tracking-tight);
 }
 
 .text-display-2 {
-  font-size: var(--font-size-6xl);
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 4.5vw, 3.5rem);
   font-weight: 700;
   line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tighter);
+  letter-spacing: var(--tracking-tight);
 }
 
 .text-display-3 {
-  font-size: clamp(2.25rem, 5vw, var(--font-size-5xl));
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 700;
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
 }
 
 .text-heading-1 {
+  font-family: var(--font-display);
   font-size: var(--font-size-4xl);
   font-weight: 600;
   line-height: var(--leading-tight);
@@ -113,6 +128,7 @@ body {
 }
 
 .text-heading-2 {
+  font-family: var(--font-display);
   font-size: var(--font-size-3xl);
   font-weight: 600;
   line-height: var(--leading-snug);
@@ -120,6 +136,7 @@ body {
 }
 
 .text-heading-3 {
+  font-family: var(--font-display);
   font-size: var(--font-size-2xl);
   font-weight: 600;
   line-height: var(--leading-snug);
@@ -138,6 +155,7 @@ body {
   font-weight: 400;
   line-height: var(--leading-relaxed);
   letter-spacing: var(--tracking-normal);
+  text-wrap: pretty;
 }
 
 .text-body-small {
@@ -147,7 +165,7 @@ body {
   letter-spacing: var(--tracking-normal);
 }
 
-/* Eyebrow / section label */
+/* Small functional label (timeline period pills, metadata) */
 .text-caption {
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -159,15 +177,9 @@ body {
 /* Responsive type */
 @media (max-width: 640px) {
   .text-display-1 { font-size: var(--font-size-5xl); }
-  .text-display-2 { font-size: var(--font-size-4xl); }
   .text-heading-1 { font-size: var(--font-size-2xl); }
   .text-heading-2 { font-size: var(--font-size-xl); }
   .text-body-large { font-size: var(--font-size-lg); }
-}
-
-@media (min-width: 1280px) {
-  .text-display-1 { font-size: 5rem; }
-  .text-display-2 { font-size: 4rem; }
 }
 
 /* ===== Kinetic typography helper ===== */
@@ -254,6 +266,11 @@ section {
   outline: 2px solid var(--color-ucla-blue);
   outline-offset: 3px;
   border-radius: 4px;
+}
+
+/* On the drenched navy surface, blue focus rings vanish — use gold */
+.bg-navy *:focus-visible {
+  outline-color: var(--color-ucla-gold);
 }
 
 /* ===== Reduced motion ===== */

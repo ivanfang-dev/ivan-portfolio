@@ -56,7 +56,6 @@ const projects: Project[] = [
 const Projects: React.FC<ProjectsProps> = ({ className = '' }) => (
   <Section id="projects" background="white" padding="xl" animate={false} className={className}>
     <SectionHeader
-      eyebrow="Selected Work"
       title="Featured projects."
       subtitle="Things I've built to solve real problems and ship polished products."
       align="left"
