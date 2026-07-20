@@ -4,7 +4,6 @@ import RevealText from './RevealText';
 import { EASE } from '../../utils/motion';
 
 export interface SectionHeaderProps {
-  eyebrow?: string;
   title: string;
   subtitle?: string;
   align?: 'left' | 'center';
@@ -13,11 +12,11 @@ export interface SectionHeaderProps {
 }
 
 /**
- * Consistent cinematic section opener: small eyebrow label, an oversized
- * heading that mask-reveals on scroll, and an optional subhead.
+ * Section opener: an oversized heading that mask-reveals on scroll, with an
+ * optional subhead. Titles ending in "." get the brand-blue terminal period —
+ * the site's one recurring typographic tic.
  */
 const SectionHeader: React.FC<SectionHeaderProps> = ({
-  eyebrow,
   title,
   subtitle,
   align = 'center',
@@ -31,6 +30,10 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
       ? 'items-center text-center mx-auto'
       : 'items-start text-left';
 
+  const endsWithPeriod = title.endsWith('.');
+  const text = endsWithPeriod ? title.slice(0, -1) : title;
+  const suffix = endsWithPeriod ? <span className="text-ucla-blue">.</span> : undefined;
+
   const reveal = (delay: number) =>
     reduce
       ? {}
@@ -43,19 +46,10 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
 
   return (
     <div className={`flex flex-col max-w-3xl ${alignment} ${className}`}>
-      {eyebrow && (
-        <motion.span
-          className="text-caption text-ink-faint mb-5 flex items-center gap-3"
-          {...reveal(0)}
-        >
-          <span className="inline-block h-px w-7 bg-ink-faint/50" />
-          {eyebrow}
-        </motion.span>
-      )}
-
       <RevealText
         as="h2"
-        text={title}
+        text={text}
+        suffix={suffix}
         split="words"
         className={titleClassName}
         stagger={0.05}

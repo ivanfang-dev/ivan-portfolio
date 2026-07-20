@@ -6,8 +6,9 @@ export interface ExperienceProps {
   className?: string;
 }
 
+// Work and education merged into one reverse-chronological timeline.
 const Experience: React.FC<ExperienceProps> = ({ className = '' }) => {
-  const experienceEntries: TimelineEntry[] = [
+  const entries: TimelineEntry[] = [
     {
       id: 'amazon-sde-intern',
       title: 'Incoming Software Development Engineer Intern',
@@ -25,6 +26,15 @@ const Experience: React.FC<ExperienceProps> = ({ className = '' }) => {
       Designed and implemented a centralized design token system (colors, spacing, typography), eliminating 11 legacy CSS files and enforcing scalable styling conventions.
       Migrated complex UI flows (chat system, modals, navigation) to component-based architecture, improving maintainability and reducing UI-related technical debt.`,
       type: 'experience',
+    },
+    {
+      id: 'ucla',
+      title: 'B.S. Computer Science',
+      organization: 'University of California, Los Angeles',
+      period: '2025 – 2028',
+      description: `Pursuing a B.S. in Computer Science (GPA 3.76, expected June 2028).
+      Dean's List (Fall 2025) and awarded the Samueli Foundation Engineering Undergraduate Scholarship.`,
+      type: 'education',
     },
     {
       id: 'founder-lioncity',
@@ -47,14 +57,28 @@ const Experience: React.FC<ExperienceProps> = ({ className = '' }) => {
       type: 'experience',
     },
     {
+      id: 'national-service',
+      title: 'National Service',
+      organization: 'Singapore Armed Forces',
+      period: '2023 – 2024',
+      description: `Completed two years of mandatory national service.`,
+      type: 'education',
+    },
+    {
       id: 'community-leader',
       title: 'Community Leader',
       organization: 'Taman Jurong Youth Network',
       period: 'Jan 2022 – Mar 2023',
-      description: `Led community engagement initiatives and organized educational programs for local youth.
-      Coordinated events, workshops, and mentorship programs that served over 200 community members.
-      Developed leadership skills while fostering connections between young people and educational opportunities.`,
+      description: `Organized educational programs, workshops, and mentorship serving 200+ local youth.`,
       type: 'experience',
+    },
+    {
+      id: 'hwa-chong',
+      title: 'GCE A Levels',
+      organization: 'Hwa Chong Institution',
+      period: '2020 – 2022',
+      description: `Achieved a perfect score (90/90 RP), placing top 10% nationwide.`,
+      type: 'education',
     },
   ];
 
@@ -62,13 +86,11 @@ const Experience: React.FC<ExperienceProps> = ({ className = '' }) => {
     <Section id="experience" background="gray" padding="xl" animate={false} className={className}>
       <div className="max-w-4xl mx-auto">
         <SectionHeader
-          eyebrow="Experience"
-          title="Where I've worked."
-          subtitle="A journey spanning entrepreneurship, software engineering, and community leadership."
+          title="Where I've been."
           align="left"
           className="mb-14"
         />
-        <Timeline entries={experienceEntries} />
+        <Timeline entries={entries} />
       </div>
     </Section>
   );

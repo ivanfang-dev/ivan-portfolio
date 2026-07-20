@@ -52,29 +52,19 @@ const Footer: React.FC<FooterProps> = ({ className = '' }) => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer id="contact" className={`bg-surface border-t border-hairline ${className}`}>
+    <footer id="contact" className={`bg-navy ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
-        <motion.span
-          className="text-caption text-ink-faint flex items-center gap-3 mb-7"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <span className="inline-block h-px w-7 bg-ink-faint/50" />
-          Get in touch
-        </motion.span>
-
         <RevealText
           as="h2"
-          text={'Let’s build\nsomething great.'}
+          text={'Let’s build\nsomething great'}
+          suffix={<span className="text-ucla-gold">.</span>}
           split="lines"
-          className="text-display-2 text-ink"
+          className="text-display-2 text-white"
           stagger={0.1}
         />
 
         <motion.p
-          className="text-body-large text-ink-soft mt-7 max-w-xl"
+          className="text-body-large text-navy-ink mt-7 max-w-xl"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
@@ -90,7 +80,7 @@ const Footer: React.FC<FooterProps> = ({ className = '' }) => {
             onMouseMove={emailMagnet.onMouseMove}
             onMouseLeave={emailMagnet.onMouseLeave}
             style={emailMagnet.style}
-            className="inline-flex items-center gap-2 rounded-full bg-ucla-blue px-7 py-3.5 text-base font-medium text-white shadow-sm hover:bg-accent-hover transition-colors"
+            className="inline-flex items-center gap-2 rounded-full bg-ucla-gold px-7 py-3.5 text-base font-medium text-ink shadow-sm hover:bg-gold-hover transition-colors"
           >
             ivanfang@ucla.edu
             <span aria-hidden>→</span>
@@ -106,7 +96,7 @@ const Footer: React.FC<FooterProps> = ({ className = '' }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="grid place-items-center h-11 w-11 rounded-full border border-hairline bg-white text-ink hover:text-ucla-blue hover:border-ucla-blue/40 transition-colors"
+                  className="grid place-items-center h-11 w-11 rounded-full border border-white/25 text-white hover:text-ucla-gold hover:border-ucla-gold/60 transition-colors"
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -117,13 +107,18 @@ const Footer: React.FC<FooterProps> = ({ className = '' }) => {
           </div>
         </div>
 
-        <div className="mt-20 pt-8 border-t border-hairline flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-body-small text-ink-faint text-center sm:text-left">
+        <div className="mt-20 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-body-small text-navy-faint text-center sm:text-left">
             © {currentYear} Ivan Fang. All rights reserved.
           </p>
-          <p className="text-body-small text-ink-faint text-center sm:text-right">
-            Built with ❤️ (along with React, Tailwind & Framer Motion)
-          </p>
+          <a
+            href={`${import.meta.env.BASE_URL}Ivan_Fang_Resume.pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-body-small text-navy-faint hover:text-white transition-colors text-center sm:text-right"
+          >
+            Resume (PDF)
+          </a>
         </div>
       </div>
     </footer>

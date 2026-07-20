@@ -31,7 +31,8 @@ const ExplosiveImage: React.FC<ExplosiveImageProps> = ({
     const element = document.getElementById('explosive-image');
     if (element) {
       element.style.animation = 'none';
-      element.offsetHeight;
+      // Force a reflow so the animation restarts from frame zero.
+      void element.offsetHeight;
       element.style.animation = 'shake 0.5s ease-in-out';
     }
 
@@ -83,7 +84,7 @@ const ExplosiveImage: React.FC<ExplosiveImageProps> = ({
       <AnimatePresence>
         {showHint && clickCount === 0 && (
           <motion.div
-            className="absolute -top-16 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium z-9999 shadow-lg"
+            className="absolute -top-16 left-1/2 -translate-x-1/2 bg-ucla-blue text-white px-3 py-2 rounded-lg text-sm font-medium z-9999 shadow-lg"
             initial={{ opacity: 0, y: 10, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.8 }}
@@ -91,9 +92,9 @@ const ExplosiveImage: React.FC<ExplosiveImageProps> = ({
           >
             <div className="flex items-center gap-1">
               <span>Try clicking me!</span>
-              <span className="animate-bounce">👆</span>
+              <span>👆</span>
             </div>
-            <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-blue-600"></div>
+            <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-ucla-blue"></div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -106,7 +107,9 @@ const ExplosiveImage: React.FC<ExplosiveImageProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
           >
-            {explosionThreshold - clickCount} more clicks! 🎯
+            {explosionThreshold - clickCount === 1
+              ? 'One more click! 🎯'
+              : `${explosionThreshold - clickCount} more clicks! 🎯`}
           </motion.div>
         )}
       </AnimatePresence>
@@ -119,7 +122,7 @@ const ExplosiveImage: React.FC<ExplosiveImageProps> = ({
         whileTap={{ scale: 0.98 }}
       >
         <motion.div
-          className="absolute inset-0 rounded-full border-2 border-blue-400 pointer-events-none"
+          className="absolute inset-0 rounded-full border-2 border-ucla-blue/60 pointer-events-none"
           animate={{ scale: [1, 1.05, 1], opacity: [0, 0.6, 0] }}
           transition={{ duration: 2, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
         />
