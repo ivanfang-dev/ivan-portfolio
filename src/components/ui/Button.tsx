@@ -14,6 +14,8 @@ export interface ButtonProps {
   type?: 'button' | 'submit' | 'reset';
   /** Cursor-magnetic pull — reserve for primary CTAs. */
   magnetic?: boolean;
+  /** With `href`, saves the file under this name instead of navigating to it. */
+  download?: string;
   ariaLabel?: string;
 }
 
@@ -43,6 +45,7 @@ const Button: React.FC<ButtonProps> = ({
   disabled = false,
   type = 'button',
   magnetic = false,
+  download,
   ariaLabel,
 }) => {
   const magnet = useMagnetic<HTMLElement>(0.4);
@@ -70,7 +73,8 @@ const Button: React.FC<ButtonProps> = ({
       <motion.a
         ref={magnetic ? (magnet.ref as unknown as React.RefObject<HTMLAnchorElement>) : undefined}
         href={href}
-        target="_blank"
+        download={download}
+        target={download ? undefined : '_blank'}
         rel="noopener noreferrer"
         aria-label={ariaLabel}
         className={combinedClassName}

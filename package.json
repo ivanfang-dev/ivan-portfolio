@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "npm run resume:preview",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "resume:preview": "bash scripts/build-resume-preview.sh",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -11,10 +11,10 @@ const Experience: React.FC<ExperienceProps> = ({ className = '' }) => {
   const entries: TimelineEntry[] = [
     {
       id: 'amazon-sde-intern',
-      title: 'Incoming Software Development Engineer Intern',
+      title: 'Software Development Engineer Intern',
       organization: 'Amazon',
       period: 'Jun 2026 – Sep 2026',
-      description: `Incoming Software Development Engineer Intern for Summer 2026 in Seattle, WA.`,
+      description: `Software Development Engineer Intern for Summer 2026 in Seattle, WA.`,
       type: 'experience',
     },
     {

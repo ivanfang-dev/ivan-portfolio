@@ -25,9 +25,8 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
     { id: 'about', label: 'About', href: '#about' },
     { id: 'projects', label: 'Projects', href: '#projects' },
     { id: 'experience', label: 'Experience', href: '#experience' },
+    { id: 'resume', label: 'Resume', href: '#resume' },
   ];
-
-  const resumeUrl = `${import.meta.env.BASE_URL}Ivan_Fang_Resume.pdf`;
 
   const activeSection = useNavigationScrollSpy(navItems.map((item) => item.id));
 
@@ -104,15 +103,6 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
               );
             })}
 
-            <a
-              href={resumeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative px-4 py-2 text-sm font-medium text-ink-soft hover:text-ink transition-colors duration-200"
-            >
-              Resume
-            </a>
-
             <div className="ml-3">
               <Button variant="primary" size="sm" magnetic onClick={() => handleNavClick('contact')}>
                 Get in touch
@@ -162,15 +152,6 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
                   {item.label}
                 </button>
               ))}
-              <a
-                href={resumeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block w-full text-left px-4 py-3 rounded-lg text-base font-medium text-ink-soft hover:text-ink hover:bg-surface transition-colors"
-              >
-                Resume
-              </a>
               <button
                 onClick={() => handleNavClick('contact')}
                 className="block w-full text-left px-4 py-3 rounded-lg text-base font-medium text-white bg-ucla-blue hover:bg-accent-hover transition-colors mt-2"

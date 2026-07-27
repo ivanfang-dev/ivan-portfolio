@@ -1,10 +1,10 @@
-import { Navbar, Hero, About, Projects, Experience, Footer } from './components';
+import { Navbar, Hero, About, Projects, Experience, Resume, Footer } from './components';
 import { useScrollSpy } from './hooks';
 import { scrollToTop } from './utils/smoothScroll';
 import { motion, useScroll } from 'framer-motion';
 
 function App() {
-  const activeSection = useScrollSpy(['hero', 'about', 'projects', 'experience']);
+  const activeSection = useScrollSpy(['hero', 'about', 'projects', 'experience', 'resume']);
   const { scrollYProgress } = useScroll();
 
   return (
@@ -22,6 +22,7 @@ function App() {
         <About />
         <Projects />
         <Experience />
+        <Resume />
       </main>
 
       <Footer />
