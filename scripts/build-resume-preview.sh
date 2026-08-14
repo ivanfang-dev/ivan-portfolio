@@ -3,6 +3,11 @@
 # renders inline. Runs automatically as `prebuild`, so any `npm run build`
 # (local or CI) regenerates it — the on-page preview can't drift from the PDF.
 #
+# Output lands in src/assets/ (not public/) so Vite content-hashes the emitted
+# filename. A stable /resume-preview.webp URL was served from a visitor's cache
+# after the PDF changed, leaving the on-page sheet showing a stale resume; a
+# hashed URL changes whenever the image does, so that can't happen.
+#
 # Run it on its own with:  npm run resume:preview
 #
 # Requires ghostscript + imagemagick:
@@ -13,7 +18,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PDF="$ROOT/public/Ivan_Fang_Resume.pdf"
-OUT="$ROOT/public/resume-preview.webp"
+OUT="$ROOT/src/assets/resume-preview.webp"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
@@ -52,5 +57,5 @@ $IM "$TMP/page1.png" -filter Lanczos -resize 1520x -strip \
 # `wc -c` rather than `du`, which reports allocated blocks and overstates on APFS.
 DIMS="$($IDENTIFY -format '%wx%h' "$OUT")"
 KB="$(( $(wc -c < "$OUT") / 1024 ))"
-echo "resume preview: $DIMS, ${KB}KB -> public/resume-preview.webp"
+echo "resume preview: $DIMS, ${KB}KB -> src/assets/resume-preview.webp"
 echo "note: if that is not 1520x1967, update PREVIEW_W/PREVIEW_H in src/components/sections/Resume.tsx"

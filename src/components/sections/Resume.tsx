@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Section, SectionHeader, Button } from '../index';
 import { EASE } from '../../utils/motion';
+import previewUrl from '../../assets/resume-preview.webp';
 
 export interface ResumeProps {
   className?: string;
@@ -11,10 +12,11 @@ const RESUME_URL = `${import.meta.env.BASE_URL}Ivan_Fang_Resume.pdf`;
 
 /* Page 1 rasterized from the PDF — regenerate with `npm run resume:preview`
    after replacing the PDF, and update the dimensions below if the page size
-   changes. Rendering a flat image instead of pdf.js keeps this section free of
-   react-pdf, which measured +125KB gzipped in the main bundle plus a 282KB
-   gzipped worker; the real PDF is one click away. */
-const PREVIEW_URL = `${import.meta.env.BASE_URL}resume-preview.webp`;
+   changes. Imported rather than referenced from public/ so the built URL is
+   content-hashed: swap the PDF and the filename changes, so no visitor gets a
+   cached copy of the old sheet. Rendering a flat image instead of pdf.js keeps
+   this section free of react-pdf, which measured +125KB gzipped in the main
+   bundle plus a 282KB gzipped worker; the real PDF is one click away. */
 const PREVIEW_W = 1520;
 const PREVIEW_H = 1967;
 
@@ -92,7 +94,7 @@ const Resume: React.FC<ResumeProps> = ({ className = '' }) => {
               })}
         >
           <img
-            src={PREVIEW_URL}
+            src={previewUrl}
             width={PREVIEW_W}
             height={PREVIEW_H}
             loading="lazy"
