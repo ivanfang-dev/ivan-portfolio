@@ -12,9 +12,12 @@ const Experience: React.FC<ExperienceProps> = ({ className = '' }) => {
     {
       id: 'amazon-sde-intern',
       title: 'Software Development Engineer Intern',
-      organization: 'Amazon',
+      organization: 'Amazon (AWS Marketplace Search)',
       period: 'Jun 2026 – Sep 2026',
-      description: `Software Development Engineer Intern for Summer 2026 in Seattle, WA.`,
+      description: `Implemented an event-driven search-indexing pipeline in Java for a 350K-document catalog, retiring two legacy indexing services and cutting update staleness from 30–60 minutes to near real-time.
+      Built a concurrency-safe OpenSearch writer using optimistic concurrency control, so concurrent real-time and bulk-backfill writers cannot overwrite fresher data or resurrect deleted records.
+      Provisioned a multi-AZ OpenSearch domain with kNN vector fields for semantic search using AWS CDK, templated across 5 regions.
+      Developed a SQS-driven AWS Lambda consumer with dead-letter queues, partial-batch failure recovery, and idempotent processing.`,
       type: 'experience',
     },
     {
@@ -32,7 +35,7 @@ const Experience: React.FC<ExperienceProps> = ({ className = '' }) => {
       title: 'B.S. Computer Science',
       organization: 'University of California, Los Angeles',
       period: '2025 – 2028',
-      description: `Pursuing a B.S. in Computer Science (GPA 3.76, expected June 2028).
+      description: `Pursuing a B.S. in Computer Science (GPA 3.78, expected June 2028).
       Dean's List (Fall 2025) and awarded the Samueli Foundation Engineering Undergraduate Scholarship.`,
       type: 'education',
     },
@@ -43,7 +46,7 @@ const Experience: React.FC<ExperienceProps> = ({ className = '' }) => {
       period: 'Jun 2025 – Present',
       description: `Built and launched a full-stack tuition-matching platform, processing over 100 matching requests within the first three months.
       Developed backend APIs using Express.js and MongoDB to handle tutor registration and parent requests.
-      Engineered a Telegram bot to automate tutor profile updates, streamlining communication for 150+ active tutors.`,
+      Engineered a Telegram bot to automate tutor profile updates, streamlining communication for 300+ active tutors.`,
       type: 'experience',
     },
     {

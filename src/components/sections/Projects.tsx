@@ -24,6 +24,19 @@ const projects: Project[] = [
     },
   },
   {
+    id: 'ucla-mentorseas',
+    title: 'UCLA MentorSEAS',
+    description: `The mentorship program pairing every incoming UCLA engineer with an upperclassman:
+    • Led a full site revamp for the 500+ students it onboards each year
+    • Building a matching system that pairs on major, academic goals and interests
+    • Shipped as part of the MentorSEAS tech team`,
+    technologies: ['React', 'Next.js', 'Tailwind'],
+    image: `${import.meta.env.BASE_URL}MentorSEAS.webp`,
+    links: {
+      demo: 'https://mentorseas.seas.ucla.edu/',
+    },
+  },
+  {
     id: 'unity',
     title: 'ANU (Unity Game)',
     description: `A top-down 2D adventure game developed for my Unity game development class:
