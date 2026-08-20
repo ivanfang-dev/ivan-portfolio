@@ -34,6 +34,7 @@ const projects: Project[] = [
     image: `${import.meta.env.BASE_URL}MentorSEAS.webp`,
     links: {
       demo: 'https://mentorseas.seas.ucla.edu/',
+      github: 'https://github.com/uclamentorseas/mentorseas-newsite',
     },
   },
   {

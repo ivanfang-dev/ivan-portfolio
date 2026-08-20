@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useNavigationScrollSpy } from '../../hooks/useScrollSpy';
@@ -20,6 +20,8 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [pendingSection, setPendingSection] = useState<string | null>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const menuToggleRef = useRef<HTMLButtonElement>(null);
 
   const navItems: NavItem[] = [
     { id: 'about', label: 'About', href: '#about' },
@@ -49,11 +51,25 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
   const displayActiveSection = pendingSection || activeSection;
 
   useEffect(() => {
+    if (!isMobileMenuOpen) return;
+
     const handleClickOutside = (event: MouseEvent) => {
-      if (isMobileMenuOpen && !(event.target as Element).closest('.mobile-menu')) {
-        setIsMobileMenuOpen(false);
-      }
+      // Clicks on the toggle and inside the menu are handled by those elements
+      // themselves; only genuine outside clicks should close the menu.
+      //
+      // Test against the dispatch path, not event.target. Click is a discrete
+      // event, so React commits the open and flushes this effect synchronously
+      // *before* the click finishes bubbling to document — and that commit
+      // swaps the hamburger icon for the close icon, detaching the <path> that
+      // was clicked. contains(event.target) is therefore false for a node that
+      // really did come from the toggle. composedPath() is resolved at dispatch
+      // time, so it still holds the original ancestors.
+      const path = event.composedPath();
+      if (menuToggleRef.current && path.includes(menuToggleRef.current)) return;
+      if (mobileMenuRef.current && path.includes(mobileMenuRef.current)) return;
+      setIsMobileMenuOpen(false);
     };
+
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, [isMobileMenuOpen]);
@@ -113,10 +129,13 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
           {/* Mobile menu button */}
           <div className="md:hidden">
             <motion.button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              ref={menuToggleRef}
+              onClick={() => setIsMobileMenuOpen((open) => !open)}
               className="inline-flex items-center justify-center p-2 rounded-lg text-ink hover:text-ucla-blue transition-colors"
               whileTap={{ scale: 0.95 }}
               aria-label="Toggle navigation menu"
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-menu"
             >
               {isMobileMenuOpen ? (
                 <XMarkIcon className="h-6 w-6" aria-hidden="true" />
@@ -132,7 +151,9 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            className="md:hidden mobile-menu overflow-hidden"
+            ref={mobileMenuRef}
+            id="mobile-menu"
+            className="md:hidden overflow-hidden"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
