@@ -13,6 +13,8 @@ export interface Project {
   imageAspect?: string;
   links: {
     demo?: string;
+    /** Label for the demo button. Defaults to "Visit site". */
+    demoLabel?: string;
     github?: string;
   };
 }
@@ -100,7 +102,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, orientation = 'verti
                   d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                 />
               </svg>
-              Live Demo
+              {links.demoLabel ?? 'Visit site'}
             </Button>
           )}
           {links.github && (

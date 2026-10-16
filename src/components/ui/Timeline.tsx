@@ -8,13 +8,29 @@ export interface TimelineEntry {
   organization: string;
   period: string;
   description: string;
-  type: 'experience' | 'education';
 }
 
 export interface TimelineProps {
   entries: TimelineEntry[];
   className?: string;
 }
+
+/** Title, organization and period pill — shared so other lists match the timeline. */
+export const EntryHeader: React.FC<Pick<TimelineEntry, 'title' | 'organization' | 'period'>> = ({
+  title,
+  organization,
+  period,
+}) => (
+  <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 mb-4">
+    <div>
+      <h3 className="text-heading-3 text-ink">{title}</h3>
+      <p className="text-body text-ucla-blue font-medium mt-1">{organization}</p>
+    </div>
+    <span className="shrink-0 inline-flex w-fit px-3 py-1 rounded-full border border-hairline bg-surface text-caption text-ink-faint">
+      {period}
+    </span>
+  </div>
+);
 
 const Timeline: React.FC<TimelineProps> = ({ entries, className = '' }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -48,17 +64,7 @@ const Timeline: React.FC<TimelineProps> = ({ entries, className = '' }) => {
             {/* Node */}
             <span className="absolute left-0 top-1.5 h-[13px] w-[13px] rounded-full bg-white border-2 border-ucla-blue" />
 
-            <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 mb-4">
-              <div>
-                <h3 className="text-heading-3 text-ink">{entry.title}</h3>
-                <p className="text-body text-ucla-blue font-medium mt-1">
-                  {entry.organization}
-                </p>
-              </div>
-              <span className="shrink-0 inline-flex w-fit px-3 py-1 rounded-full border border-hairline bg-surface text-caption text-ink-faint">
-                {entry.period}
-              </span>
-            </div>
+            <EntryHeader {...entry} />
 
             <ul className="prose-list">
               {entry.description

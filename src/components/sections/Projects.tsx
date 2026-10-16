@@ -48,6 +48,7 @@ const projects: Project[] = [
     image: `${import.meta.env.BASE_URL}ANU.webp`,
     links: {
       demo: 'https://toastercosplay.itch.io/an-u',
+      demoLabel: 'Play game',
       github: 'https://github.com/ivanfang-dev/ENGR1-GD-Group-Project',
     },
   },
