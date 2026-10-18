@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Private working notes (design briefs, critiques) — kept local, not published
+docs/
+.impeccable/

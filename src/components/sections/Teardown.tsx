@@ -26,11 +26,10 @@ import {
 } from '../teardown/layers';
 
 /*
- * "The Teardown" — the hero and the LionCity case study as one scroll story
- * (brief: docs/hero-teardown-brief.md). LionCity assembles itself beside the
- * name; scrolling pins the stage, tilts the product into an exploded stack,
- * and pulls each layer out to face the reader before slotting it back. It
- * reassembles over the outcome. Native scroll only; reduced motion gets a
+ * "The Teardown" — the hero and the LionCity case study as one scroll story.
+ * LionCity assembles itself beside the name; scrolling pins the stage, tilts
+ * the product into an exploded stack, and pulls each layer out to face the
+ * reader before slotting it back. It reassembles over the outcome. Native scroll only; reduced motion gets a
  * static stacked diagram with the same captions.
  */
 
