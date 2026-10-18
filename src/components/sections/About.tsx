@@ -19,7 +19,7 @@ When I'm not coding or studying, you'll find me reading, or doomscrolling in bed
   const imgRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   // After the reveal wipe finishes, expand the clip region past the box so the
-  // "Try clicking me!" hint and explosion particles aren't clipped to its edges.
+  // photo's speech bubble and progress ring aren't clipped to its edges.
   const [revealed, setRevealed] = useState(false);
   // Track visibility on this outer wrapper rather than on the clipped box itself:
   // the initial `inset(0 0 100% 0)` clip makes the box's intersection ratio 0, so a
@@ -47,7 +47,7 @@ When I'm not coding or studying, you'll find me reading, or doomscrolling in bed
         {/* Image */}
         <div ref={imgRef} className="flex justify-center lg:justify-start">
           <motion.div
-            className="relative w-full max-w-md"
+            className="relative w-full max-w-md px-3 sm:px-0"
             variants={{
               hidden: { clipPath: 'inset(0 0 100% 0)' },
               visible: { clipPath: 'inset(0 0 0% 0)' },
@@ -62,8 +62,8 @@ When I'm not coding or studying, you'll find me reading, or doomscrolling in bed
             <div className="aspect-[4/5] flex items-center justify-center">
               <ExplosiveImage
                 src={`${import.meta.env.BASE_URL}ivan-photo.webp`}
-                alt="Ivan Fang"
-                className="w-full h-full"
+                alt="Ivan Fang holding a fluffy white dog"
+                className="w-full"
                 explosionThreshold={5}
                 surpriseImage={`${import.meta.env.BASE_URL}ivan-surprise.webp`}
                 objectFit="contain"
@@ -73,7 +73,7 @@ When I'm not coding or studying, you'll find me reading, or doomscrolling in bed
         </div>
 
         {/* Text */}
-        <div className="text-center lg:text-left">
+        <div>
           <SectionHeader
             title="A builder from Singapore, now at UCLA!"
             align="left"
@@ -94,7 +94,7 @@ When I'm not coding or studying, you'll find me reading, or doomscrolling in bed
               </motion.p>
             ))}
             
-            <motion.div variants={item} className="pt-4 flex justify-center lg:justify-start">
+            <motion.div variants={item} className="pt-4 flex">
               <Button variant="primary" size="lg" magnetic onClick={() => scrollToSection('contact')}>
                 Get in touch
               </Button>

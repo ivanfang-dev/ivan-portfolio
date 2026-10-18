@@ -10,20 +10,6 @@ export interface ProjectsProps {
 
 const projects: Project[] = [
   {
-    id: 'lioncity-tutors',
-    title: 'LionCity Tutors',
-    description: `A tutoring platform connecting students and educators across Singapore:
-    • Built full-stack web application serving 300+ active users
-    • Integrated Telegram Bot API for seamless communication and notifications
-    • Reduced average tutor search time from weeks to hours`,
-    technologies: ['React', 'MongoDB', 'Telegram API'],
-    image: `${import.meta.env.BASE_URL}LionCity.webp`,
-    links: {
-      demo: 'https://www.lioncitytutors.com/',
-      github: 'https://github.com/ivanfang-dev/lioncity-tutors',
-    },
-  },
-  {
     id: 'ucla-mentorseas',
     title: 'UCLA MentorSEAS',
     description: `The mentorship program pairing every incoming UCLA engineer with an upperclassman:
@@ -71,13 +57,13 @@ const projects: Project[] = [
 const Projects: React.FC<ProjectsProps> = ({ className = '' }) => (
   <Section id="projects" background="white" padding="xl" animate={false} className={className}>
     <SectionHeader
-      title="Featured projects."
-      subtitle="Things I've built to solve real problems and ship polished products."
+      title="More things I've built."
+      subtitle="A team build, a class game and a campus marketplace."
       align="left"
       className="mb-12"
     />
 
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-stretch">
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 items-stretch">
       {projects.map((project, i) => (
         <motion.div
           key={project.id}

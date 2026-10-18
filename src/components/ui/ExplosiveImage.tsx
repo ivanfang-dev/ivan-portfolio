@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence, useAnimationControls, useInView, useReducedMotion } from 'framer-motion';
 import confetti from 'canvas-confetti';
+import { EASE } from '../../utils/motion';
 
 interface ExplosiveImageProps {
   src: string;
@@ -8,169 +9,230 @@ interface ExplosiveImageProps {
   className?: string;
   explosionThreshold?: number;
   surpriseImage?: string;
+  surpriseAlt?: string;
   objectFit?: 'cover' | 'contain' | 'fill' | 'scale-down' | 'none';
 }
 
+const CONFETTI_COLORS = ['#2774ae', '#ffd100', '#8bb8e8', '#ffffff'];
+
+// Literal class names so Tailwind can see them.
+const OBJECT_FIT = {
+  cover: 'object-cover',
+  contain: 'object-contain',
+  fill: 'object-fill',
+  'scale-down': 'object-scale-down',
+  none: 'object-none',
+} as const;
+
+/**
+ * The About photo, with someone hiding behind it. Each click boops the photo
+ * and fills a gold ring around it — honest progress toward the reveal — until
+ * the dog takes over in a burst of confetti. Click again to swap back.
+ *
+ * The photos are circular cut-outs, so the button, ring and focus outline are
+ * all round to match.
+ */
 const ExplosiveImage: React.FC<ExplosiveImageProps> = ({
   src,
   alt,
   className = '',
   explosionThreshold = 5,
-  surpriseImage = `${import.meta.env.BASE_URL}IMG_5788-modified.png`,
+  surpriseImage = `${import.meta.env.BASE_URL}ivan-surprise.webp`,
+  surpriseAlt = 'The real star of the show: a fluffy white dog sitting in autumn leaves',
   objectFit = 'contain',
 }) => {
-  const [clickCount, setClickCount] = useState(0);
-  const [isExploded, setIsExploded] = useState(false);
-  const [showSurprise, setShowSurprise] = useState(false);
-  const [showHint, setShowHint] = useState(false);
+  const reduce = useReducedMotion();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const boop = useAnimationControls();
+  const inView = useInView(buttonRef, { once: true, amount: 0.6 });
 
-  const handleClick = useCallback(() => {
-    const newClickCount = clickCount + 1;
-    setClickCount(newClickCount);
+  const [clicks, setClicks] = useState(0);
+  const [revealed, setRevealed] = useState(false);
+  const [hint, setHint] = useState(false);
+  const [backToMe, setBackToMe] = useState(false);
+  const backTimer = useRef<number | undefined>(undefined);
 
-    const element = document.getElementById('explosive-image');
-    if (element) {
-      element.style.animation = 'none';
-      // Force a reflow so the animation restarts from frame zero.
-      void element.offsetHeight;
-      element.style.animation = 'shake 0.5s ease-in-out';
+  // Offer the hint once, after the About wipe has finished and the photo is
+  // actually on screen — never while the visitor is still up in the hero.
+  useEffect(() => {
+    if (!inView) return;
+    const show = window.setTimeout(() => setHint(true), 1200);
+    const hide = window.setTimeout(() => setHint(false), 6000);
+    return () => {
+      window.clearTimeout(show);
+      window.clearTimeout(hide);
+    };
+  }, [inView]);
+
+  useEffect(() => () => window.clearTimeout(backTimer.current), []);
+
+  const burst = () => {
+    const el = buttonRef.current;
+    if (!el || reduce) return;
+    const rect = el.getBoundingClientRect();
+    const origin = {
+      x: (rect.left + rect.width / 2) / window.innerWidth,
+      y: (rect.top + rect.height / 2) / window.innerHeight,
+    };
+    confetti({ particleCount: 180, spread: 80, startVelocity: 42, origin, colors: CONFETTI_COLORS, scalar: 0.9, zIndex: 9999 });
+    confetti({ particleCount: 120, spread: 130, startVelocity: 28, origin, colors: CONFETTI_COLORS, scalar: 0.7, zIndex: 9999 });
+  };
+
+  const handleClick = () => {
+    setHint(false);
+
+    if (revealed) {
+      setRevealed(false);
+      setClicks(0);
+      setBackToMe(true);
+      window.clearTimeout(backTimer.current);
+      backTimer.current = window.setTimeout(() => setBackToMe(false), 2200);
+      return;
     }
 
-    if (newClickCount >= explosionThreshold && !isExploded) {
-      // Confetti burst centered on the image (skipped under reduced motion).
-      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (element && !prefersReduced) {
-        const rect = element.getBoundingClientRect();
-        const origin = {
-          x: (rect.left + rect.width / 2) / window.innerWidth,
-          y: (rect.top + rect.height / 2) / window.innerHeight,
-        };
-        const colors = ['#2774ae', '#ffd100', '#8bb8e8', '#ffffff'];
-        confetti({ particleCount: 220, spread: 80, startVelocity: 45, origin, colors, scalar: 0.9, zIndex: 9999 });
-        confetti({ particleCount: 160, spread: 120, startVelocity: 30, origin, colors, scalar: 0.7, zIndex: 9999 });
-      }
-
-      setIsExploded(true);
-
-      setTimeout(() => setShowSurprise(true), 800);
-      setTimeout(() => {
-        setIsExploded(false);
-        setShowSurprise(false);
-        setClickCount(0);
-      }, 8000);
+    setBackToMe(false);
+    if (!reduce) {
+      boop.start({ scale: [1, 0.94, 1.025, 1], transition: { duration: 0.36, times: [0, 0.3, 0.7, 1], ease: 'easeOut' } });
     }
-  }, [clickCount, explosionThreshold, isExploded]);
 
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      if (clickCount === 0) {
-        setShowHint(true);
-        setTimeout(() => setShowHint(false), 4000);
-      }
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, [clickCount]);
+    const next = clicks + 1;
+    if (next >= explosionThreshold) {
+      setClicks(explosionThreshold);
+      setRevealed(true);
+      burst();
+    } else {
+      setClicks(next);
+    }
+  };
+
+  const remaining = explosionThreshold - clicks;
+  const bubble: { text: string; tone: 'blue' | 'gold' } | null = revealed
+    ? { text: 'Meet the real star of the show 🐶', tone: 'gold' }
+    : backToMe
+      ? { text: 'Okay, back to me 😄', tone: 'blue' }
+      : clicks > 0
+        ? { text: remaining === 1 ? 'One more! 🐾' : `${remaining} more clicks 🐾`, tone: 'blue' }
+        : hint
+          ? { text: 'Psst, someone wants to say hi 🐾', tone: 'blue' }
+          : null;
+
+  const status = revealed
+    ? 'Surprise revealed.'
+    : clicks > 0
+      ? `${remaining} more ${remaining === 1 ? 'click' : 'clicks'} to the surprise.`
+      : '';
+
+  const imgClass = `absolute inset-0 w-full h-full ${OBJECT_FIT[objectFit]} select-none`;
+  const progress = clicks / explosionThreshold;
 
   return (
-    <div className="relative flex flex-col items-center">
-      <style>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
-          20%, 40%, 60%, 80% { transform: translateX(2px); }
-        }
-      `}</style>
-
-      <AnimatePresence>
-        {showHint && clickCount === 0 && (
-          <motion.div
-            className="absolute -top-16 left-1/2 -translate-x-1/2 bg-ucla-blue text-white px-3 py-2 rounded-lg text-sm font-medium z-9999 shadow-lg"
-            initial={{ opacity: 0, y: 10, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.8 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-          >
-            <div className="flex items-center gap-1">
-              <span>Try clicking me!</span>
-              <span>👆</span>
-            </div>
-            <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-ucla-blue"></div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {clickCount > 0 && clickCount < explosionThreshold && (
-          <motion.div
-            className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-sm z-9999"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-          >
-            {explosionThreshold - clickCount === 1
-              ? 'One more click! 🎯'
-              : `${explosionThreshold - clickCount} more clicks! 🎯`}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <motion.div
-        id="explosive-image"
-        className={`relative cursor-pointer select-none ${className} group`}
+    <div className={`relative flex items-center justify-center ${className}`}>
+      <motion.button
+        ref={buttonRef}
+        type="button"
         onClick={handleClick}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        aria-label={revealed ? `${surpriseAlt}. Click to switch back.` : `${alt}. Click a few times for a surprise.`}
+        className="relative block w-full aspect-square rounded-full cursor-pointer"
+        whileHover={reduce ? undefined : { scale: 1.02 }}
+        transition={{ duration: 0.3, ease: EASE }}
       >
-        <motion.div
-          className="absolute inset-0 rounded-full border-2 border-ucla-blue/60 pointer-events-none"
-          animate={{ scale: [1, 1.05, 1], opacity: [0, 0.6, 0] }}
-          transition={{ duration: 2, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
-        />
-
-        <motion.div
-          className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 rounded-full flex items-center justify-center"
-          initial={{ opacity: 0 }}
-          whileHover={{ opacity: 1 }}
+        {/* Progress ring — fills a fifth per click. */}
+        <svg
+          aria-hidden
+          viewBox="0 0 100 100"
+          // overflow-visible: the ring scales past its viewBox when the dog appears.
+          className="pointer-events-none absolute -inset-2.5 h-[calc(100%+1.25rem)] w-[calc(100%+1.25rem)] -rotate-90 overflow-visible"
         >
-          <motion.div
-            className="text-white text-sm font-medium bg-black bg-opacity-75 px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm"
-            initial={{ scale: 0.8, y: 10 }}
-            whileHover={{ scale: 1, y: 0 }}
-          >
-            Click me! 🎉
-          </motion.div>
+          <motion.circle
+            cx="50"
+            cy="50"
+            r="48.5"
+            fill="none"
+            className="stroke-ucla-blue/15"
+            strokeWidth="0.8"
+            initial={false}
+            animate={{ opacity: clicks > 0 && !revealed ? 1 : 0 }}
+            transition={{ duration: 0.3 }}
+          />
+          <motion.circle
+            cx="50"
+            cy="50"
+            r="48.5"
+            fill="none"
+            className="stroke-ucla-gold"
+            strokeWidth="1"
+            strokeLinecap="round"
+            initial={false}
+            animate={{ pathLength: progress, opacity: clicks > 0 ? 1 : 0, scale: revealed && !reduce ? 1.04 : 1 }}
+            transition={{
+              pathLength: { type: 'spring', stiffness: 260, damping: 24 },
+              opacity: { duration: revealed ? 0.6 : 0.2, delay: revealed ? 0.35 : 0 },
+              scale: { duration: 0.6, ease: EASE },
+            }}
+            style={{ transformOrigin: '50% 50%' }}
+          />
+        </svg>
+
+        <motion.div className="absolute inset-0" animate={boop}>
+          <motion.img
+            src={src}
+            alt=""
+            draggable={false}
+            className={imgClass}
+            initial={false}
+            animate={{ opacity: revealed ? 0 : 1, scale: revealed && !reduce ? 0.85 : 1 }}
+            transition={{ duration: 0.35, ease: EASE }}
+          />
+          <AnimatePresence>
+            {revealed && (
+              <motion.img
+                key="surprise"
+                src={surpriseImage}
+                alt=""
+                draggable={false}
+                className={imgClass}
+                initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.6, rotate: -8 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: reduce ? 1 : 0.9, transition: { duration: 0.25 } }}
+                transition={reduce ? { duration: 0.3 } : { type: 'spring', stiffness: 320, damping: 18, delay: 0.12 }}
+              />
+            )}
+          </AnimatePresence>
         </motion.div>
+      </motion.button>
 
-        <motion.img
-          src={src}
-          alt={alt}
-          className={`w-full h-full object-${objectFit}`}
-          animate={{
-            opacity: showSurprise ? 0 : isExploded ? 0.3 : 1,
-            scale: isExploded ? 0.8 : 1,
-          }}
-          transition={{ duration: 0.5 }}
-        />
-
-        {showSurprise && (
+      {/* Speech bubble above the photo */}
+      <AnimatePresence mode="wait">
+        {bubble && (
           <motion.div
-            className="absolute inset-0 z-10 bg-white rounded-full overflow-hidden"
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            key={bubble.text}
+            aria-hidden
+            className="pointer-events-none absolute bottom-full left-1/2 mb-6 -translate-x-1/2 z-20"
+            initial={{ opacity: 0, y: reduce ? 0 : 8, scale: reduce ? 1 : 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: reduce ? 0 : -4, transition: { duration: 0.12 } }}
+            transition={{ type: 'spring', stiffness: 480, damping: 28 }}
+            style={{ transformOrigin: '50% 100%' }}
           >
-            <img src={surpriseImage} alt="Surprise!" className="w-full h-full object-contain" />
-            <motion.div
-              className="absolute -top-12 left-1/2 -translate-x-1/2 text-4xl z-20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+            <span
+              className={`relative block w-max max-w-[17rem] rounded-xl px-3.5 py-2 text-sm font-medium shadow-[0_8px_24px_-8px_rgba(20,47,76,0.35)] ${
+                bubble.tone === 'gold' ? 'bg-ucla-gold text-ink' : 'bg-ucla-blue text-white'
+              }`}
             >
-              🎉✨🎊
-            </motion.div>
+              {bubble.text}
+              <span
+                className={`absolute top-full left-1/2 -translate-x-1/2 border-x-[7px] border-t-[7px] border-x-transparent ${
+                  bubble.tone === 'gold' ? 'border-t-ucla-gold' : 'border-t-ucla-blue'
+                }`}
+              />
+            </span>
           </motion.div>
         )}
-      </motion.div>
+      </AnimatePresence>
+
+      <span role="status" className="sr-only">
+        {status}
+      </span>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import RevealText from './RevealText';
+import FullStop from './FullStop';
 import { EASE } from '../../utils/motion';
 
 export interface SectionHeaderProps {
@@ -14,7 +15,7 @@ export interface SectionHeaderProps {
 /**
  * Section opener: an oversized heading that mask-reveals on scroll, with an
  * optional subhead. Titles ending in "." get the brand-blue terminal period —
- * the site's one recurring typographic tic.
+ * the site's one recurring typographic tic — which drops in after the words.
  */
 const SectionHeader: React.FC<SectionHeaderProps> = ({
   title,
@@ -32,7 +33,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
 
   const endsWithPeriod = title.endsWith('.');
   const text = endsWithPeriod ? title.slice(0, -1) : title;
-  const suffix = endsWithPeriod ? <span className="text-ucla-blue">.</span> : undefined;
+  const suffix = endsWithPeriod ? <FullStop className="text-ucla-blue" delay={0.5} /> : undefined;
 
   const reveal = (delay: number) =>
     reduce
