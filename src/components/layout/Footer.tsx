@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import RevealText from '../ui/RevealText';
+import FullStop from '../ui/FullStop';
+import CopyEmailButton from '../ui/CopyEmailButton';
 import { useMagnetic } from '../../hooks/useMagnetic';
 import { EASE } from '../../utils/motion';
 
@@ -57,7 +59,7 @@ const Footer: React.FC<FooterProps> = ({ className = '' }) => {
         <RevealText
           as="h2"
           text={'Let’s build\nsomething great'}
-          suffix={<span className="text-ucla-gold">.</span>}
+          suffix={<FullStop className="text-ucla-gold" delay={0.6} />}
           split="lines"
           className="text-display-2 text-white"
           stagger={0.1}
@@ -74,17 +76,20 @@ const Footer: React.FC<FooterProps> = ({ className = '' }) => {
         </motion.p>
 
         <div className="mt-10 flex flex-col sm:flex-row sm:items-center gap-8">
-          <motion.a
-            ref={emailMagnet.ref}
-            href="mailto:ivanfang@ucla.edu"
-            onMouseMove={emailMagnet.onMouseMove}
-            onMouseLeave={emailMagnet.onMouseLeave}
-            style={emailMagnet.style}
-            className="inline-flex items-center gap-2 rounded-full bg-ucla-gold px-7 py-3.5 text-base font-medium text-ink shadow-sm hover:bg-gold-hover transition-colors"
-          >
-            ivanfang@ucla.edu
-            <span aria-hidden>→</span>
-          </motion.a>
+          <div className="flex items-center gap-2">
+            <motion.a
+              ref={emailMagnet.ref}
+              href="mailto:ivanfang@ucla.edu"
+              onMouseMove={emailMagnet.onMouseMove}
+              onMouseLeave={emailMagnet.onMouseLeave}
+              style={emailMagnet.style}
+              className="inline-flex items-center gap-2 rounded-full bg-ucla-gold px-7 py-3.5 text-base font-medium text-ink shadow-sm hover:bg-gold-hover transition-colors"
+            >
+              ivanfang@ucla.edu
+              <span aria-hidden>→</span>
+            </motion.a>
+            <CopyEmailButton email="ivanfang@ucla.edu" />
+          </div>
 
           <div className="flex items-center sm:justify-start gap-3">
             {socialLinks.map((social) => {
@@ -115,7 +120,7 @@ const Footer: React.FC<FooterProps> = ({ className = '' }) => {
             href={`${import.meta.env.BASE_URL}Ivan_Fang_Resume.pdf`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-body-small text-navy-faint hover:text-white transition-colors text-center sm:text-right"
+            className="inline-flex min-h-11 items-center sm:min-h-0 text-body-small text-navy-faint hover:text-white transition-colors"
           >
             Resume (PDF)
           </a>

@@ -30,7 +30,9 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
     { id: 'resume', label: 'Resume', href: '#resume' },
   ];
 
-  const activeSection = useNavigationScrollSpy(navItems.map((item) => item.id));
+  // 'hero' is a sentinel: without it the spy falls back to the first item, lighting
+  // up About for the whole (very tall) hero.
+  const activeSection = useNavigationScrollSpy(['hero', ...navItems.map((item) => item.id)]);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -88,7 +90,7 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
           {/* Logo */}
           <motion.button
             onClick={() => handleNavClick('hero')}
-            className="text-heading-3 font-semibold text-ink hover:text-ucla-blue transition-colors"
+            className="inline-flex h-11 items-center text-heading-3 font-semibold text-ink hover:text-ucla-blue transition-colors"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -103,7 +105,7 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`relative px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                  className={`relative px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${
                     active ? 'text-ink' : 'text-ink-soft hover:text-ink'
                   }`}
                 >
@@ -131,7 +133,7 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
             <motion.button
               ref={menuToggleRef}
               onClick={() => setIsMobileMenuOpen((open) => !open)}
-              className="inline-flex items-center justify-center p-2 rounded-lg text-ink hover:text-ucla-blue transition-colors"
+              className="inline-flex items-center justify-center h-11 w-11 -mr-2 rounded-lg text-ink hover:text-ucla-blue transition-colors"
               whileTap={{ scale: 0.95 }}
               aria-label="Toggle navigation menu"
               aria-expanded={isMobileMenuOpen}

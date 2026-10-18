@@ -83,12 +83,21 @@ const RevealText: React.FC<RevealTextProps> = ({
               {unit || ' '}
               {i === units.length - 1 && suffix}
             </motion.span>
+            {/* Collapses visually; keeps the accessible name from fusing lines. */}
+            {i < units.length - 1 && ' '}
           </span>
         ) : (
           <React.Fragment key={i}>
             <span
               className="line-mask"
-              style={{ display: 'inline-block', verticalAlign: 'top' }}
+              style={{
+                display: 'inline-block',
+                verticalAlign: 'top',
+                // Room for an animated suffix (FullStop squashes wider on landing).
+                ...(i === units.length - 1 && suffix
+                  ? { paddingRight: '0.2em', marginRight: '-0.2em' }
+                  : {}),
+              }}
             >
               <motion.span className="inline-block will-change-transform" variants={child}>
                 {unit}

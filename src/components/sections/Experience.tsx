@@ -79,7 +79,7 @@ const education: EducationEntry[] = [
     id: 'ucla',
     title: 'B.S. Computer Science',
     organization: 'University of California, Los Angeles',
-    period: '2025 – 2028',
+    period: 'Expected graduation 2028',
     description: "GPA 3.78 · Dean's List (Fall 2025) · Samueli Foundation Engineering Scholarship",
     involvement: [
       {
@@ -87,6 +87,7 @@ const education: EducationEntry[] = [
         role: 'Developer',
         summary:
           "Helped build an in-house application portal for ACM's internship program, replacing a third-party Airtable workflow with a full-stack platform the club owns and maintains.",
+        links: [{ label: 'ACM Internship portal', href: 'https://members.uclaacm.com/internship' }],
       },
       {
         org: 'Quantum Computing Student Association',
@@ -114,6 +115,12 @@ const education: EducationEntry[] = [
   },
 ];
 
+const ArrowUpRight: React.FC<{ className?: string }> = ({ className = '' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H8m9 0v9" />
+  </svg>
+);
+
 const Experience: React.FC<ExperienceProps> = ({ className = '' }) => {
   const reduce = useReducedMotion();
 
@@ -133,8 +140,9 @@ const Experience: React.FC<ExperienceProps> = ({ className = '' }) => {
           titleClassName="text-heading-1 text-ink"
           className="mt-24 mb-12"
         />
-        {/* Indented to line up with the timeline's text column */}
-        <div className="space-y-12 pl-10 sm:pl-14">
+        {/* Lines up with the timeline's text column from sm up; on phones there's
+            no rail to align with, so entries take the full width. */}
+        <div className="space-y-12 sm:pl-14">
           {education.map((entry) => (
             <motion.div
               key={entry.id}
@@ -147,32 +155,41 @@ const Experience: React.FC<ExperienceProps> = ({ className = '' }) => {
               <p className="text-body-small text-ink-soft">{entry.description}</p>
 
               {entry.involvement && (
-                <ul className="grid gap-3 sm:grid-cols-3 mt-6">
+                // Phones: stacked cards. Tablets: one card per row, name beside
+                // summary. Desktop: three columns.
+                <ul className="mt-6 grid gap-3 lg:grid-cols-3">
                   {entry.involvement.map((item) => (
                     <li
                       key={item.org}
-                      className="flex flex-col p-5 rounded-xl bg-white border border-hairline"
+                      className="rounded-xl border border-hairline bg-white p-5 sm:grid sm:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] sm:gap-x-6 lg:flex lg:flex-col"
                     >
-                      <p className="text-body-small text-ink">
-                        <span className="font-semibold">{item.org}</span>
-                      </p>
-                      <p className="text-body-small text-ucla-blue">{item.role}</p>
-                      <p className="text-body-small text-ink-soft mt-3">{item.summary}</p>
-                      {item.links && (
-                        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-auto pt-3">
-                          {item.links.map((link) => (
-                            <a
-                              key={link.href}
-                              href={link.href}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-body-small text-ucla-blue hover:underline underline-offset-4"
-                            >
-                              {link.label} ↗
-                            </a>
-                          ))}
-                        </div>
-                      )}
+                      <div>
+                        {/* Weight on an inner span: .text-body-small's unlayered
+                            font-weight would beat a utility on the same element. */}
+                        <p className="text-body-small text-ink">
+                          <span className="font-semibold">{item.org}</span>
+                        </p>
+                        <p className="text-body-small text-ucla-blue">{item.role}</p>
+                      </div>
+                      <div className="mt-3 flex min-w-0 flex-col sm:mt-0 lg:mt-3 lg:flex-1">
+                        <p className="text-body-small text-ink-soft">{item.summary}</p>
+                        {item.links && (
+                          <div className="mt-4 flex flex-wrap gap-2 lg:mt-auto lg:pt-4">
+                            {item.links.map((link) => (
+                              <a
+                                key={link.href}
+                                href={link.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex h-8 max-w-full items-center gap-1 rounded-full bg-ucla-blue/[0.07] px-3 text-sm font-medium text-ucla-blue transition-colors hover:bg-ucla-blue/[0.13] pointer-coarse:h-11"
+                              >
+                                <span className="truncate">{link.label}</span>
+                                <ArrowUpRight className="h-3.5 w-3.5 shrink-0" />
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </li>
                   ))}
                 </ul>

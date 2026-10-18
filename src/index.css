@@ -261,16 +261,31 @@ section {
 }
 
 /* ===== Focus (accessible, unobtrusive) ===== */
+/* No border-radius here: outlines follow each element's own corners, so pills
+   and round icon buttons keep their shape while focused. */
 *:focus { outline: none; }
 *:focus-visible {
   outline: 2px solid var(--color-ucla-blue);
   outline-offset: 3px;
-  border-radius: 4px;
 }
 
 /* On the drenched navy surface, blue focus rings vanish — use gold */
 .bg-navy *:focus-visible {
   outline-color: var(--color-ucla-gold);
+}
+
+/* ===== Browser surfaces ===== */
+::selection {
+  background-color: rgb(39 116 174 / 0.18); /* ucla-blue at 18% */
+  color: var(--color-ink);
+}
+.bg-navy ::selection {
+  background-color: var(--color-ucla-gold);
+  color: var(--color-ink);
+}
+
+html {
+  scrollbar-color: oklch(75% 0.03 250) transparent;
 }
 
 /* ===== Reduced motion ===== */

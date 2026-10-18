@@ -1,4 +1,4 @@
-import { Navbar, Hero, About, Projects, Experience, Resume, Footer } from './components';
+import { Navbar, Teardown, About, Projects, Experience, Resume, Footer } from './components';
 import { useScrollSpy } from './hooks';
 import { scrollToTop } from './utils/smoothScroll';
 import { motion, useScroll } from 'framer-motion';
@@ -18,7 +18,7 @@ function App() {
       <Navbar />
 
       <main className="relative">
-        <Hero />
+        <Teardown />
         <About />
         <Projects />
         <Experience />
