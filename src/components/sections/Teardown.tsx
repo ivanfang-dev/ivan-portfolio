@@ -108,7 +108,7 @@ const BEATS: Beat[] = [
     tab: 'Bot',
     label: 'telegram bot',
     title: '400+ tutors, run from Telegram.',
-    body: 'Tutors view and edit their profiles through a Telegram bot I wrote, and every new assignment is posted to our Telegram channel.',
+    body: 'Every new assignment is posted to our Telegram channel. Tutors tap Apply, name their rate and confirm in a bot I wrote, which also keeps their profiles up to date.',
     note: 'The stage shows a simulation of the real bot.',
   },
 ];
