@@ -83,7 +83,9 @@ const SCATTER: Record<string, { x: number; y: number; rotate: number }> = {
   cta: { x: -40, y: 140, rotate: -8 },
   wa: { x: 60, y: 150, rotate: 7 },
   chips: { x: -20, y: 170, rotate: 2 },
-  photo: { x: 160, y: 10, rotate: 6 },
+  map: { x: 160, y: -20, rotate: 4 },
+  replay: { x: 140, y: 110, rotate: -5 },
+  towns: { x: 90, y: 150, rotate: 3 },
   bubble: { x: 120, y: 120, rotate: 20 },
 };
 const ORDER = Object.keys(SCATTER);
@@ -116,6 +118,123 @@ const Frag: React.FC<{
     >
       {children}
     </motion.div>
+  );
+};
+
+/*
+ * The live hero's tutor map: LionCity's own dot-grid Singapore (public/lc-tutor-map.svg,
+ * copied from apps/website/public/sg-tutor-map.svg), replaying one real request. All
+ * coordinates are that map's grid units, viewBox -1 -1 106 51.
+ */
+
+const MAP_W = 318;
+const MAP_H = (MAP_W * 51) / 106;
+const MAP_SRC = `${import.meta.env.BASE_URL}lc-tutor-map.svg`;
+
+// The first replay in apps/website/src/data/matchReplays.js. Minutes from the request.
+const REPLAY = { title: 'Primary 1 English', town: 'Punggol', month: 'Jun 2026', contacted: 14, messaged: 1, yes: [26, 34, 38], sent: 45 };
+const clock = (mins: number) => `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}`;
+
+// Punggol's pin, and the 14 north-east tutors it messaged. The yeses carry their minute
+// and which side of the dot their label sits on, so the three never collide.
+const PIN: [number, number] = [65.2, 14];
+const ASKED: { at: [number, number]; yes?: number; side?: 'left' | 'right' | 'below' }[] = [
+  { at: [64, 13] }, { at: [65, 12] }, { at: [66, 13] }, { at: [67, 13] },
+  { at: [69, 13], yes: 34, side: 'right' }, { at: [69, 15] }, { at: [67, 15] }, { at: [64, 15] },
+  { at: [62, 14] }, { at: [60, 15], yes: 26, side: 'left' }, { at: [58, 17] }, { at: [61, 17] },
+  { at: [64, 19], yes: 38, side: 'below' }, { at: [66, 19] },
+];
+
+/** A message's flight from the pin: lifted off the straight line, alternately each side. */
+const arcTo = ([bx, by]: [number, number], i: number) => {
+  const [ax, ay] = PIN;
+  const dx = bx - ax;
+  const dy = by - ay;
+  const len = Math.hypot(dx, dy) || 1;
+  const lift = Math.min(5, len * 0.4) * (i % 2 ? 1 : -1);
+  return `M ${ax} ${ay} Q ${ax + dx / 2 - (dy / len) * lift} ${ay + dy / 2 + (dx / len) * lift} ${bx} ${by}`;
+};
+
+const pct = ([x, y]: [number, number]) => ({ left: `${((x + 1) / 106) * 100}%`, top: `${((y + 1) / 51) * 100}%` });
+
+// The live hero's camera on this request: pushed in 1.5×, centred on the pin, clamped to the map.
+const ZOOM = 1.5;
+const CAMERA = {
+  x: `${Math.min(0, Math.max(1 - ZOOM, 0.5 - ((PIN[0] + 1) / 106) * ZOOM)) * 100}%`,
+  y: `${Math.min(0, Math.max(1 - ZOOM, 0.45 - ((PIN[1] + 1) / 51) * ZOOM)) * 100}%`,
+};
+
+type Pose = Record<string, number | string>;
+
+/** Plays once after the map lands; a scroll snaps it to its end like the fragments. */
+const beat = (assemble: boolean, instant: boolean, delay: number, from: Pose, to: Pose, duration = 0.5) => ({
+  variants: {
+    off: from,
+    on: { ...to, transition: { duration, ease: [0.22, 1, 0.36, 1] as const, delay } },
+    snapped: { ...to, transition: { duration: 0 } },
+  },
+  initial: assemble ? 'off' : false,
+  animate: instant ? 'snapped' : 'on',
+});
+
+const TutorMap: React.FC<{ assemble: boolean; instant: boolean }> = ({ assemble, instant }) => {
+  const at = (delay: number, from: Pose, to: Pose, duration?: number) => beat(assemble, instant, delay, from, to, duration);
+  const yeses = ASKED.filter((t) => t.yes !== undefined).sort((a, b) => a.yes! - b.yes!);
+  const yesDelay = (t: (typeof ASKED)[number]) => 3 + yeses.indexOf(t) * 0.3;
+  const centred = { transformBox: 'fill-box', transformOrigin: 'center' } as const;
+  return (
+    <div
+      className="absolute inset-0 overflow-hidden"
+      style={{
+        WebkitMaskImage: 'radial-gradient(ellipse 72% 70% at 50% 50%, #000 62%, transparent 100%)',
+        maskImage: 'radial-gradient(ellipse 72% 70% at 50% 50%, #000 62%, transparent 100%)',
+      }}
+    >
+      {/* The whole island first, then the camera flies in on the request. Everything inside is
+          scaled with it, so the overlay below is drawn at 1/ZOOM of its on-screen size. */}
+      <motion.div className="absolute inset-0 origin-top-left" {...at(1.25, { x: '0%', y: '0%', scale: 1 }, { ...CAMERA, scale: ZOOM }, 1.1)}>
+        <img src={MAP_SRC} alt="" draggable={false} className="absolute inset-0 h-full w-full select-none" />
+        <svg className="absolute inset-0 h-full w-full" viewBox="-1 -1 106 51" fill="none" strokeLinecap="round" aria-hidden>
+          {ASKED.map((t, i) => (
+            <motion.path
+              key={i}
+              d={arcTo(t.at, i)}
+              stroke={LC.orange}
+              strokeOpacity={t.yes ? 0.6 : 0.35}
+              strokeWidth={0.3}
+              {...at(2.15 + i * 0.05, { pathLength: 0, opacity: 0 }, { pathLength: 1, opacity: 1 })}
+            />
+          ))}
+          {ASKED.map((t, i) =>
+            t.yes ? (
+              <motion.circle key={i} cx={t.at[0]} cy={t.at[1]} r={0.9} fill={LC.blue} stroke="#fff" strokeWidth={0.4} {...at(yesDelay(t), { scale: 0 }, { scale: 1 })} style={centred} />
+            ) : (
+              <motion.circle key={i} cx={t.at[0]} cy={t.at[1]} r={0.65} stroke={LC.orange} strokeOpacity={0.6} strokeWidth={0.25} {...at(2.6 + i * 0.05, { opacity: 0 }, { opacity: 1 })} />
+            ),
+          )}
+          <motion.circle cx={PIN[0]} cy={PIN[1]} r={2.8} stroke={LC.orange} strokeOpacity={0.35} strokeWidth={0.3} {...at(2.05, { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1 })} style={centred} />
+          <motion.circle cx={PIN[0]} cy={PIN[1]} r={1.3} fill={LC.orange} stroke="#fff" strokeWidth={0.6} {...at(2, { scale: 0 }, { scale: 1 })} style={centred} />
+        </svg>
+        {yeses.map((t) => (
+          <span
+            key={t.yes}
+            className="absolute"
+            style={{
+              ...pct(t.at),
+              transform: t.side === 'left' ? 'translate(calc(-100% - 3px), -50%)' : t.side === 'right' ? 'translate(3px, -50%)' : 'translate(-50%, 3px)',
+            }}
+          >
+            <motion.span
+              className="block whitespace-nowrap rounded-full bg-white px-[3.5px] py-[1.5px] text-[4.8px] font-semibold shadow-[0_1px_4px_rgba(0,0,0,0.12)]"
+              style={{ color: LC.blue }}
+              {...at(yesDelay(t) + 0.1, { opacity: 0 }, { opacity: 1 })}
+            >
+              Yes · {clock(t.yes!)}
+            </motion.span>
+          </span>
+        ))}
+      </motion.div>
+    </div>
   );
 };
 
@@ -190,9 +309,61 @@ export const StorefrontLayer: React.FC<StorefrontProps> = ({ assemble = false, i
         </Frag>
       </div>
 
-      {/* Hero photo */}
-      <Frag id="photo" {...f} className="absolute right-[24px] top-[92px] h-[288px] w-[248px] overflow-hidden rounded-[14px] bg-[#ececec] shadow-[0_16px_30px_-16px_rgba(0,0,0,0.35)]">
-        <img src={`${import.meta.env.BASE_URL}lc-photo.webp`} alt="" draggable={false} className="h-full w-full object-cover object-top" />
+      {/* Tutor map, bleeding off the right edge like the live hero */}
+      <Frag id="map" {...f} className="absolute left-[334px] top-[96px]" style={{ width: MAP_W, height: MAP_H }}>
+        <TutorMap {...f} />
+        <span className="absolute left-[6px] top-[4px] flex items-center gap-1 rounded-full border bg-white px-2 py-[3px] text-[7.5px] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.04)]" style={{ borderColor: LC.line, color: LC.body }}>
+          <svg width="7" height="8" viewBox="0 0 24 24" fill="none" stroke={LC.orange} strokeWidth="2.5" aria-hidden><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0116 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+          Find your neighbourhood
+        </span>
+      </Frag>
+
+      {/* The replay card: one real request, pin to shortlist */}
+      <Frag id="replay" {...f} className="absolute right-[18px] top-[214px] w-[226px] rounded-[12px] border bg-white p-3 shadow-[0_8px_24px_rgba(0,0,0,0.10)]" style={{ borderColor: LC.line }}>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="text-[7.5px]" style={{ color: LC.faint }}>Real request · {REPLAY.town} · {REPLAY.month}</div>
+            <div className="mt-0.5 text-[10.5px] font-semibold" style={{ color: LC.ink }}>{REPLAY.title}</div>
+          </div>
+          <div className="text-right leading-none">
+            <div className="text-[21px] font-bold tabular-nums tracking-[-0.02em]" style={{ color: LC.blue }}>{clock(REPLAY.sent)}</div>
+            <div className="mt-0.5 text-[7px]" style={{ color: LC.faint }}>hrs since request</div>
+          </div>
+        </div>
+        <ol className="mt-2.5 space-y-[5px] border-t pt-2.5 text-[8.5px]" style={{ borderColor: '#f5f5f5' }}>
+          {[
+            [`${REPLAY.contacted} tutors messaged`, REPLAY.messaged],
+            ['First tutor says yes', REPLAY.yes[0]],
+            [`${REPLAY.yes.length} profiles sent to the parent`, REPLAY.sent],
+          ].map(([label, at], i, rows) => {
+            const last = i === rows.length - 1;
+            return (
+              <li key={label} className="flex items-center gap-2">
+                <span
+                  className="h-[7px] w-[7px] shrink-0 rounded-full"
+                  style={{ background: last ? LC.orange : LC.blue, boxShadow: last ? '0 0 0 2px rgba(235,113,29,0.2)' : undefined }}
+                />
+                <span className={`flex-1 ${last ? 'font-semibold' : ''}`} style={{ color: last ? LC.ink : '#404040' }}>{label}</span>
+                <span className="tabular-nums" style={{ color: LC.body }}>{clock(at as number)}</span>
+              </li>
+            );
+          })}
+        </ol>
+      </Frag>
+
+      {/* Replay picker */}
+      <Frag id="towns" {...f} className="absolute right-[58px] top-[352px] flex items-center gap-0.5 text-[8.5px]" style={{ color: LC.faint }}>
+        {['Punggol', 'Jurong West', 'Bedok', 'Hougang'].map((town, i) => (
+          <span
+            key={town}
+            className={`relative rounded-full px-2 py-[3px] ${i === 0 ? 'font-medium' : ''}`}
+            style={i === 0 ? { background: 'rgba(4,116,186,0.1)', color: '#035e96' } : undefined}
+          >
+            {town}
+            {i === 0 && <span className="absolute inset-x-2 bottom-[1px] h-px rounded-full" style={{ background: LC.blue, opacity: 0.45 }} />}
+          </span>
+        ))}
+        <svg className="ml-1" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={LC.faint} strokeWidth="2.5" aria-hidden><path d="M8 5v14M16 5v14" /></svg>
       </Frag>
 
       {/* Floating WhatsApp button */}
@@ -235,10 +406,10 @@ export const MatchingLayer: React.FC<{ reveal: MotionValue<number> }> = ({ revea
         </div>
         <dl className="mt-3 grid grid-cols-[64px_1fr] gap-y-[7px] text-[10.5px]">
           {[
-            ['Level', 'Primary 5'],
-            ['Subject', 'Math'],
-            ['Area', 'Jurong West'],
-            ['Lessons', '2× a week'],
+            ['Level', 'Primary 2'],
+            ['Subject', 'Maths'],
+            ['Area', 'Novena'],
+            ['Lessons', 'Once a week'],
           ].map(([k, v]) => (
             <React.Fragment key={k}>
               <dt style={{ color: LC.faint }}>{k}</dt>
@@ -411,54 +582,90 @@ export const DataLayer: React.FC<{ reveal: MotionValue<number> }> = ({ reveal })
 /* 4 · Telegram — the assignments channel and the profile bot         */
 /* ------------------------------------------------------------------ */
 
-const TG = { head: '#ffffff', wall: '#dfe8ee', out: '#e3fbcf', accent: '#3390ec', meta: '#8a9aa9' };
+const TG = {
+  head: '#ffffff',
+  wall: 'linear-gradient(160deg, #c3d9a4 0%, #a6c792 55%, #93ba8c 100%)',
+  out: '#effdde',
+  outMeta: '#5fa857',
+  key: 'rgba(56, 84, 48, 0.32)',
+  meta: '#8a9aa9',
+};
+
+// The flow follows apps/telegram-bot: utils/channelFormat.js for the channel post, then
+// bot/handlers.js (sendRateInputPrompt, confirm, "Application Submitted Successfully!").
+// One assignment throughout, the P2 Maths job from Ivan's own walkthrough.
+const JOB = { title: 'P2 Maths', level: 'Primary 2', subject: 'Mathematics', location: 'Novena', frequency: 'Once a week', rate: '$40-60/hr' };
+
+const Bubble: React.FC<{ className?: string; time: string; children: React.ReactNode }> = ({ className = '', time, children }) => (
+  <div className={`relative rounded-[11px] rounded-bl-[4px] bg-white px-2.5 pb-1.5 pt-2 shadow-[0_1px_1px_rgba(0,0,0,0.1)] ${className}`}>
+    {children}
+    <div className="-mt-0.5 text-right text-[7px]" style={{ color: TG.meta }}>{time}</div>
+  </div>
+);
+
+/** Telegram's inline keyboard: translucent keys hung under the message. */
+const Keys: React.FC<{ keys: string[] }> = ({ keys }) => (
+  <div className="mt-[3px] space-y-[3px]">
+    {keys.map((key) => (
+      <div key={key} className="rounded-[7px] py-[5px] text-center text-[8.5px] font-medium text-white" style={{ background: TG.key }}>
+        {key}
+      </div>
+    ))}
+  </div>
+);
 
 export const TelegramLayer: React.FC<{ reveal: MotionValue<number> }> = ({ reveal }) => (
   <Panel className="flex" style={{ background: TG.wall, boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)' }}>
-    {/* Channel */}
-    <div className="relative h-full w-[290px] border-r border-black/[0.06]">
-      <ChatHeader title="LionCity Assignments" sub="channel · tutors get every new job here" />
-      <div className="px-4 pt-4">
-        <Reveal reveal={reveal} at={0.06}>
-          <div className="w-[236px] rounded-[12px] rounded-bl-[4px] bg-white p-3 text-[10.5px] leading-[1.5] shadow-[0_1px_1px_rgba(0,0,0,0.08)]" style={{ color: LC.ink }}>
-            <div className="font-bold">📢 New assignment</div>
-            <div className="mt-1">Primary 5 · Math</div>
-            <div>Jurong West · 2× a week</div>
-            <div style={{ color: LC.body }}>Weekday evenings</div>
-            <div className="mt-2 rounded-[8px] py-1.5 text-center text-[10px] font-semibold" style={{ background: '#e8f1fb', color: TG.accent }}>
-              Apply via bot
-            </div>
-            <div className="mt-1 text-right text-[8px]" style={{ color: TG.meta }}>7:42 PM</div>
-          </div>
+    {/* Channel: every new assignment, posted by the bot */}
+    <div className="relative h-full w-[262px] border-r border-black/[0.08]">
+      <ChatHeader title="LionCity Tutors" sub="channel" />
+      <div className="px-3 pt-3 text-[9.5px] leading-[1.5]" style={{ color: LC.ink }}>
+        <Reveal reveal={reveal} at={0.04}>
+          <Bubble time="10:47 AM">
+            <div>🎯 <b>Title:</b> {JOB.title}</div>
+            <div className="mt-1.5">📚 <b>Level:</b> {JOB.level}</div>
+            <div>📖 <b>Subject:</b> {JOB.subject}</div>
+            <div>📍 <b>Location:</b> {JOB.location}</div>
+            <div>📅 <b>Frequency:</b> {JOB.frequency}</div>
+            <div>💰 <b>Rate:</b> {JOB.rate}</div>
+            <div>👨‍🏫 <b>Tutor Type:</b> Any</div>
+            <div className="mt-1.5">💼 <b>Status:</b> Open</div>
+            <div className="mt-1.5 font-bold">👇 Click below to apply for this assignment!</div>
+          </Bubble>
+        </Reveal>
+        <Reveal reveal={reveal} at={0.1}>
+          <Keys keys={['📝 Apply for this Assignment']} />
         </Reveal>
       </div>
     </div>
 
-    {/* Bot chat */}
+    {/* Bot: rate, confirm, submitted */}
     <div className="relative h-full flex-1">
       <ChatHeader title="LionCity Bot" sub="bot" />
-      <div className="space-y-2 px-4 pt-4 text-[10.5px] leading-[1.45]" style={{ color: LC.ink }}>
-        <Reveal reveal={reveal} at={0.24} className="flex justify-end">
-          <span className="rounded-[12px] rounded-br-[4px] px-3 py-1.5" style={{ background: TG.out }}>/profile</span>
+      <div className="space-y-[7px] px-3 pt-3 text-[9.5px] leading-[1.45]" style={{ color: LC.ink }}>
+        <Reveal reveal={reveal} at={0.2} className="w-[262px]">
+          <Bubble time="10:49 AM">
+            <div className="font-bold">💰 Please enter your tuition rate for this assignment</div>
+            <div className="mt-1" style={{ color: LC.body }}>📝 <b style={{ color: LC.ink }}>Format Examples:</b> 30 · $30 · 30/hr · $30/hr</div>
+          </Bubble>
         </Reveal>
-        <Reveal reveal={reveal} at={0.36}>
-          <div className="w-[236px] rounded-[12px] rounded-bl-[4px] bg-white p-3 shadow-[0_1px_1px_rgba(0,0,0,0.08)]">
-            <div>Here’s your profile 👋</div>
-            <div className="mt-1" style={{ color: LC.body }}>Subjects: P5–P6 Math, Science</div>
-            <div style={{ color: LC.body }}>Areas: West, Central</div>
-            <div className="mt-2 grid grid-cols-2 gap-1.5 text-[9.5px] font-semibold" style={{ color: TG.accent }}>
-              <span className="rounded-[7px] bg-[#e8f1fb] py-1 text-center">Edit subjects</span>
-              <span className="rounded-[7px] bg-[#e8f1fb] py-1 text-center">Edit availability</span>
-            </div>
-          </div>
-        </Reveal>
-        <Reveal reveal={reveal} at={0.52} className="flex justify-end">
-          <span className="rounded-[12px] rounded-br-[4px] px-3 py-1.5" style={{ background: TG.out }}>Edit availability</span>
-        </Reveal>
-        <Reveal reveal={reveal} at={0.64}>
-          <span className="inline-block rounded-[12px] rounded-bl-[4px] bg-white px-3 py-1.5 shadow-[0_1px_1px_rgba(0,0,0,0.08)]">
-            Done ✅ Availability updated.
+        <Reveal reveal={reveal} at={0.3} className="flex justify-end">
+          <span className="rounded-[11px] rounded-br-[4px] px-2.5 py-1.5 shadow-[0_1px_1px_rgba(0,0,0,0.1)]" style={{ background: TG.out }}>
+            $40/hr <span className="ml-1 text-[7px]" style={{ color: TG.outMeta }}>10:50 AM ✓✓</span>
           </span>
+        </Reveal>
+        <Reveal reveal={reveal} at={0.4} className="w-[262px]">
+          <Bubble time="10:50 AM">
+            Please review your profile, the assignment details, and your rate above. Would you like to update your profile or proceed with the application?
+          </Bubble>
+          <Keys keys={['📝 Update Profile', '✅ Confirm Application']} />
+        </Reveal>
+        <Reveal reveal={reveal} at={0.55} className="w-[262px]">
+          <Bubble time="10:50 AM">
+            <div className="font-bold">✅ Application Submitted Successfully!</div>
+            <div className="mt-1 font-bold">🎯 {JOB.title} <span className="font-normal" style={{ color: LC.body }}>· {JOB.location} · {JOB.rate}</span></div>
+            <div className="mt-1">📝 <b>Application Status:</b> Pending</div>
+          </Bubble>
         </Reveal>
       </div>
       <span className="absolute bottom-3 right-3 rounded-full bg-black/55 px-2.5 py-1 text-[8.5px] font-semibold tracking-[0.04em] text-white">
