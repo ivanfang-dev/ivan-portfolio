@@ -13,10 +13,10 @@ const projects: Project[] = [
     id: 'ucla-mentorseas',
     title: 'UCLA MentorSEAS',
     description: `The mentorship program pairing every incoming UCLA engineer with an upperclassman:
-    • Led a full site revamp for the 500+ students it onboards each year
-    • Building a matching system that pairs on major, academic goals and interests
-    • Shipped as part of the MentorSEAS tech team`,
-    technologies: ['React', 'Next.js', 'Tailwind'],
+    • Leading a full site revamp for the program, which serves 1,100+ students each year
+    • Built a Python matching tool that paired 1,144 incoming students with 119 mentors across 11 majors
+    • Tech Lead of the MentorSEAS tech team`,
+    technologies: ['React', 'Next.js', 'Tailwind', 'Python'],
     image: `${import.meta.env.BASE_URL}MentorSEAS.webp`,
     links: {
       demo: 'https://mentorseas.seas.ucla.edu/',

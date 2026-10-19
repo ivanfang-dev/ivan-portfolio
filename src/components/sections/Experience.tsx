@@ -26,7 +26,7 @@ const entries: TimelineEntry[] = [
     title: 'Software Development Engineer Intern',
     organization: 'Amazon (AWS Marketplace Search)',
     period: 'Jun 2026 – Sep 2026',
-    description: `Implemented an event-driven search-indexing pipeline in Java for a 350K-document catalog, retiring two legacy indexing services and cutting update staleness from 30–60 minutes to near real-time.
+    description: `Implemented an event-driven search-indexing pipeline in Java for a 350K-document catalog, retiring two legacy indexing services and cutting update staleness from 60 minutes to near real-time.
     Built a concurrency-safe OpenSearch writer using optimistic concurrency control, so concurrent real-time and bulk-backfill writers cannot overwrite fresher data or resurrect deleted records.
     Provisioned a multi-AZ OpenSearch domain with kNN vector fields for semantic search using AWS CDK, templated across 5 regions.
     Developed a SQS-driven AWS Lambda consumer with dead-letter queues, partial-batch failure recovery, and idempotent processing.`,
@@ -47,7 +47,7 @@ const entries: TimelineEntry[] = [
     period: 'Jun 2025 – Present',
     description: `Built and launched a full-stack tuition-matching platform, processing over 100 matching requests within the first three months.
     Developed backend APIs using Express.js and MongoDB to handle tutor registration and parent requests.
-    Engineered a Telegram bot to automate tutor profile updates, streamlining communication for 300+ active tutors.`,
+    Engineered a Telegram bot to automate tutor profile updates, streamlining communication for 400+ active tutors.`,
   },
   {
     id: 'software-engineering-intern',
@@ -100,8 +100,8 @@ const education: EducationEntry[] = [
       },
       {
         org: 'MentorSEAS',
-        role: 'Tech Team',
-        summary: 'Led the full site revamp for the program that onboards 500+ new engineers each year.',
+        role: 'Tech Lead',
+        summary: 'Leading the full site revamp for the program serving 1,100+ engineering students each year, and built the Python tool that matched 1,144 incoming students to 119 mentors.',
         links: [{ label: 'mentorseas.seas.ucla.edu', href: 'https://mentorseas.seas.ucla.edu/' }],
       },
     ],
